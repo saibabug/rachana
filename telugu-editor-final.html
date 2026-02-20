@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="te" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>తెలుగు రచన సంపాదకుడు - Telugu Writing Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@300;400;500;600;700;900&family=Noto+Sans+Telugu:wght@300;400;500;600;700;900&family=Tiro+Telugu&family=Mandali&family=Ramabhadra&family=Gurajada&family=Tenali+Ramakrishna&family=Peddana&family=Ramaraja&family=Gidugu&family=Lakki+Reddy&family=NTR&family=Sree+Krushnadevaraya&family=Suranna&family=Suravaram&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0e0b08;
+  --bg-panel: #16120d;
+  --bg-card: #1e1812;
+  --bg-editor: #faf6ee;
+  --gold: #c9933a;
+  --gold-light: #e8b95c;
+  --gold-pale: #f5dfa0;
+  --amber: #d4791a;
+  --rust: #8b3a1e;
+  --cream: #fdf6e3;
+  --text-light: #e8d9bc;
+  --text-muted: #8a7560;
+  --border: #2e2318;
+  --border-gold: #4a3a1e;
+  --accent: #c9933a;
+  --sidebar-w: 280px;
+  --toolbar-h: 56px;
+  --status-h: 28px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: var(--text-light); font-family: 'Noto Sans Telugu', sans-serif; }
+
+/* ═══ APP SHELL ═══ */
+#app { display: grid; grid-template-rows: auto auto 1fr auto; height: 100vh; }
+#titlebar {
+  background: linear-gradient(135deg, #0a0703 0%, #1a1008 40%, #0d0b06 100%);
+  border-bottom: 1px solid var(--gold);
+  padding: 0 16px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+#titlebar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+}
+.title-logo {
+  font-family: 'Noto Serif Telugu', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, var(--gold-pale), var(--gold), var(--amber));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.title-sub { font-size: 10px; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 1px; }
+.title-actions { display: flex; gap: 8px; align-items: center; }
+.title-btn {
+  background: rgba(201,147,58,0.12);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: 'Noto Sans Telugu', sans-serif;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.title-btn:hover { background: rgba(201,147,58,0.25); border-color: var(--gold); }
+.title-btn.primary { background: linear-gradient(135deg, var(--amber), var(--gold)); color: #1a0f05; border-color: var(--gold-light); font-weight: 600; }
+.title-btn.primary:hover { background: linear-gradient(135deg, var(--gold), var(--gold-light)); }
+
+/* ═══ TOOLBAR ═══ */
+#toolbar {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  height: var(--toolbar-h);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 4px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+.tb-sep { width: 1px; height: 28px; background: var(--border); margin: 0 6px; flex-shrink: 0; }
+.tb-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+.tb-btn:hover { background: rgba(201,147,58,0.1); border-color: var(--border-gold); color: var(--gold-light); }
+.tb-btn.active { background: rgba(201,147,58,0.2); border-color: var(--gold); color: var(--gold-light); }
+.tb-select {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+  flex-shrink: 0;
+  font-family: 'Noto Sans Telugu', sans-serif;
+  max-width: 180px;
+}
+.tb-select:hover { border-color: var(--border-gold); }
+.font-size-input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  width: 50px;
+  text-align: center;
+  outline: none;
+}
+
+/* ═══ MAIN LAYOUT ═══ */
+#main { display: flex; overflow: hidden; position: relative; }
+
+/* ═══ LEFT SIDEBAR ═══ */
+#sidebar-left {
+  width: var(--sidebar-w);
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 0.25s;
+}
+#sidebar-left.collapsed { width: 0; }
+.sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.s-tab {
+  flex: 1;
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.s-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+.sidebar-panel { display: none; flex-direction: column; overflow: hidden; height: 100%; padding: 12px; }
+.sidebar-panel.active { display: flex; }
+
+/* Chapters */
+.chapter-actions { display: flex; gap: 6px; margin-bottom: 10px; }
+.ch-btn {
+  flex: 1;
+  background: rgba(201,147,58,0.1);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 6px 4px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+.ch-btn:hover { background: rgba(201,147,58,0.25); }
+#chapter-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.chapter-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.chapter-item:hover { border-color: var(--border-gold); }
+.chapter-item.active { border-color: var(--gold); background: rgba(201,147,58,0.08); }
+.chapter-title { font-size: 13px; color: var(--text-light); margin-bottom: 4px; font-weight: 500; }
+.chapter-meta { font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 10px; }
+.chapter-delete {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: rgba(139,58,30,0.3);
+  border: 1px solid var(--rust);
+  color: var(--rust);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.chapter-item:hover .chapter-delete { opacity: 1; }
+.chapter-delete:hover { background: var(--rust); color: white; }
+
+/* ═══ EDITOR ═══ */
+#editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+#text-editor {
+  flex: 1;
+  padding: 32px 48px;
+  overflow-y: auto;
+  background: var(--bg-editor);
+  color: #2a1e0f;
+  font-family: 'Noto Serif Telugu', serif;
+  font-size: 16px;
+  line-height: 1.8;
+  outline: none;
+  direction: ltr;
+}
+#editor-status {
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+  height: var(--status-h);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.status-item { display: flex; align-items: center; gap: 12px; }
+
+/* ═══ RIGHT SIDEBAR ═══ */
+#sidebar-right {
+  width: var(--sidebar-w);
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 0.25s;
+}
+#sidebar-right.collapsed { width: 0; }
+.right-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.r-tab {
+  flex: 1;
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.r-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+.right-panel { display: none; flex-direction: column; overflow: hidden; height: 100%; padding: 12px; }
+.right-panel.active { display: flex; }
+
+/* ═══ DICTIONARY PANEL ═══ */
+.dict-search-box {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.dict-input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 15px;
+  font-family: 'Noto Sans Telugu', sans-serif;
+  outline: none;
+}
+
+.dict-input:focus {
+  border-color: var(--gold);
+}
+
+.dict-search-btn {
+  background: rgba(201,147,58,0.2);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.dict-search-btn:hover {
+  background: rgba(201,147,58,0.35);
+  border-color: var(--gold);
+}
+
+.dict-results {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+}
+
+.dict-entry {
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dict-entry:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.dict-word {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold-light);
+  font-family: 'Noto Serif Telugu', serif;
+  margin-bottom: 10px;
+}
+
+.dict-pos {
+  font-size: 11px;
+  color: var(--amber);
+  font-style: italic;
+  margin-bottom: 8px;
+  display: inline-block;
+  background: rgba(201,147,58,0.15);
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+.dict-meaning {
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.7;
+  margin-bottom: 10px;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+
+.dict-example {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-left: 12px;
+  margin-top: 6px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border-gold);
+}
+
+.dict-synonyms {
+  font-size: 12px;
+  color: var(--gold-pale);
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(201,147,58,0.08);
+  border-radius: 4px;
+  border-left: 2px solid var(--gold);
+}
+
+.dict-loading {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.dict-error {
+  text-align: center;
+  padding: 20px;
+  color: var(--rust);
+  font-size: 13px;
+}
+
+.dict-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.dict-quick-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.dict-quick-word {
+  background: rgba(201,147,58,0.12);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dict-quick-word:hover {
+  background: rgba(201,147,58,0.25);
+  border-color: var(--gold);
+}
+
+/* Templates */
+.template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex: 1; overflow-y: auto; }
+.template-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.template-card:hover { border-color: var(--border-gold); }
+.template-card.active { border-color: var(--gold); background: rgba(201,147,58,0.08); }
+.template-icon { font-size: 28px; margin-bottom: 6px; }
+.template-name { font-size: 11px; color: var(--text-light); }
+
+/* Reference */
+.ref-section { margin-bottom: 16px; }
+.ref-title { font-size: 12px; color: var(--gold-light); font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.ref-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 8px; margin-bottom: 6px; cursor: pointer; font-size: 13px; color: var(--text-light); transition: all 0.2s; }
+.ref-item:hover { border-color: var(--border-gold); background: rgba(201,147,58,0.08); }
+.ref-panel-content { flex: 1; overflow-y: auto; }
+
+/* Settings */
+.setting-group { margin-bottom: 16px; }
+.setting-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; display: block; }
+.setting-select, .setting-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  outline: none;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+.setting-btn {
+  width: 100%;
+  background: rgba(201,147,58,0.2);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.setting-btn:hover { background: rgba(201,147,58,0.35); }
+.lang-opts { display: flex; gap: 6px; margin-top: 6px; }
+.lang-opt {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 6px 4px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.lang-opt:hover { border-color: var(--border-gold); }
+.lang-opt.active { border-color: var(--gold); background: rgba(201,147,58,0.2); color: var(--gold-light); }
+
+/* ═══ SIDEBAR TOGGLES ═══ */
+.sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 8px 6px;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.sidebar-toggle:hover { background: var(--bg-card); color: var(--gold-light); border-color: var(--border-gold); }
+#left-toggle { left: var(--sidebar-w); }
+#left-toggle.collapsed { left: 0; }
+#right-toggle { right: var(--sidebar-w); }
+#right-toggle.collapsed { right: 0; }
+
+/* ═══ MODALS ═══ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-gold);
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 85vh;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(201,147,58,0.25);
+}
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title { font-size: 16px; color: var(--gold-light); font-weight: 600; font-family: 'Noto Serif Telugu', serif; }
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.modal-close:hover { color: var(--gold-light); }
+.modal-body { padding: 20px; overflow-y: auto; max-height: calc(85vh - 120px); }
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+.form-input, .form-textarea {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+.form-textarea { min-height: 80px; resize: vertical; }
+.form-input:focus, .form-textarea:focus { border-color: var(--gold); }
+.modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.btn {
+  background: rgba(201,147,58,0.15);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn:hover { background: rgba(201,147,58,0.3); }
+.btn.primary { background: linear-gradient(135deg, var(--amber), var(--gold)); color: #1a0f05; border-color: var(--gold-light); font-weight: 600; }
+.btn.primary:hover { background: linear-gradient(135deg, var(--gold), var(--gold-light)); }
+
+/* Wide modal for export preview */
+.modal-wide { max-width: 900px; }
+#preview-content { padding: 20px; background: white; color: #2a1e0f; font-family: 'Noto Serif Telugu', serif; line-height: 1.8; max-height: 60vh; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; }
+#layout-buttons { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.layout-btn { flex: 1; min-width: 100px; padding: 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; text-align: center; font-size: 11px; color: var(--text-light); transition: all 0.2s; }
+.layout-btn:hover { border-color: var(--border-gold); }
+.layout-btn.active { border-color: var(--gold); background: rgba(201,147,58,0.15); color: var(--gold-light); }
+
+/* Stats Modal */
+#stats-content { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+/* Cover Modal */
+#cover-modal .modal { max-width: 850px; }
+.cover-designer { display: grid; grid-template-columns: 420px 1fr; gap: 20px; }
+#cover-preview { 
+  width: 400px; 
+  height: 600px; 
+  border: 2px solid var(--border-gold); 
+  border-radius: 8px; 
+  overflow: hidden; 
+  position: relative;
+  background: #000;
+}
+#cover-canvas { width: 100%; height: 100%; }
+.cover-controls { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; max-height: 600px; }
+.cover-section-title { 
+  font-size: 13px; 
+  color: var(--gold-light); 
+  font-weight: 600; 
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.cover-images-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 8px;
+  padding: 4px;
+}
+.cover-image-item {
+  aspect-ratio: 2/3;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.2s;
+  position: relative;
+}
+.cover-image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cover-image-item:hover {
+  border-color: var(--border-gold);
+  transform: scale(1.05);
+}
+.cover-image-item.active {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(201,147,58,0.5);
+}
+.cover-image-loading {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.cover-templates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+.cover-template {
+  aspect-ratio: 2/3;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+  position: relative;
+}
+.cover-template:hover { border-color: var(--border-gold); }
+.cover-template.active { border-color: var(--gold); box-shadow: 0 0 12px rgba(201,147,58,0.4); }
+
+/* Notification */
+#notification {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: linear-gradient(135deg, var(--amber), var(--gold));
+  color: #1a0f05;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(201,147,58,0.4);
+  z-index: 2000;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+#notification.show { opacity: 1; transform: translateY(0); }
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-card); }
+::-webkit-scrollbar-thumb { background: var(--border-gold); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- ═══ TITLEBAR ═══ -->
+  <div id="titlebar">
+    <div>
+      <div class="title-logo">తెలుగు రచన సంపాదకుడు</div>
+      <div class="title-sub">Telugu Writing Studio</div>
+    </div>
+    <div class="title-actions">
+      <button class="title-btn" onclick="openModal('book-modal')">📚 పుస్తక వివరాలు</button>
+      <button class="title-btn" onclick="openModal('cover-modal')">🎨 కవర్ డిజైన్</button>
+      <button class="title-btn" onclick="openModal('preview-modal')">👁️ ప్రివ్యూ</button>
+      <button class="title-btn primary" onclick="saveAll()">💾 సేవ్ చేయి</button>
+    </div>
+  </div>
+
+  <!-- ═══ TOOLBAR ═══ -->
+  <div id="toolbar">
+    <button class="tb-btn" onclick="execCmd('bold')" title="బోల్డ్ (Ctrl+B)"><b>B</b></button>
+    <button class="tb-btn" onclick="execCmd('italic')" title="ఇటాలిక్ (Ctrl+I)"><i>I</i></button>
+    <button class="tb-btn" onclick="execCmd('underline')" title="అండర్‌లైన్ (Ctrl+U)"><u>U</u></button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" onclick="execCmd('justifyLeft')" title="ఎడమ">≡</button>
+    <button class="tb-btn" onclick="execCmd('justifyCenter')" title="మధ్య">≣</button>
+    <button class="tb-btn" onclick="execCmd('justifyRight')" title="కుడి">≡</button>
+    <div class="tb-sep"></div>
+    <select class="tb-select" onchange="changeFont(this.value)" id="font-select">
+      <option value="'Noto Serif Telugu', serif">Noto Serif Telugu</option>
+      <option value="'Noto Sans Telugu', sans-serif">Noto Sans Telugu</option>
+      <option value="'Tiro Telugu', serif">Tiro Telugu</option>
+      <option value="'Peddana', serif">Peddana</option>
+      <option value="'Ramaraja', serif">Ramaraja</option>
+      <option value="'Mandali', sans-serif">Mandali</option>
+      <option value="'Ramabhadra', sans-serif">Ramabhadra</option>
+      <option value="'Tenali Ramakrishna', sans-serif">Tenali Ramakrishna</option>
+      <option value="'Gurajada', serif">Gurajada</option>
+      <option value="'Gidugu', sans-serif">Gidugu</option>
+      <option value="'Lakki Reddy', cursive">Lakki Reddy</option>
+      <option value="'NTR', sans-serif">NTR</option>
+      <option value="'Sree Krushnadevaraya', serif">Sree Krushnadevaraya</option>
+      <option value="'Suranna', serif">Suranna</option>
+      <option value="'Suravaram', serif">Suravaram</option>
+    </select>
+    <input type="number" class="font-size-input" value="16" min="12" max="32" onchange="changeFontSize(this.value)" id="font-size">
+    <div class="tb-sep"></div>
+    <button class="tb-btn" onclick="execCmd('insertUnorderedList')">• లిస్ట్</button>
+    <button class="tb-btn" onclick="execCmd('insertOrderedList')">1. లిస్ట్</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" onclick="execCmd('undo')">↶ వెనుకకు</button>
+    <button class="tb-btn" onclick="execCmd('redo')">↷ ముందుకు</button>
+  </div>
+
+  <!-- ═══ MAIN ═══ -->
+  <div id="main">
+    <!-- LEFT SIDEBAR -->
+    <div id="sidebar-left">
+      <div class="sidebar-tabs">
+        <div class="s-tab active" onclick="switchSTab('chapters', this)">అధ్యాయాలు</div>
+        <div class="s-tab" onclick="switchSTab('templates', this)">టెంప్లేట్లు</div>
+      </div>
+      <div id="panel-chapters" class="sidebar-panel active">
+        <div class="chapter-actions">
+          <button class="ch-btn" onclick="addChapter()">+ కొత్త అధ్యాయం</button>
+        </div>
+        <div id="chapter-list"></div>
+      </div>
+      <div id="panel-templates" class="sidebar-panel">
+        <div class="template-grid">
+          <div class="template-card" onclick="applyTemplate('novel')">
+            <div class="template-icon">📖</div>
+            <div class="template-name">నవల</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('story')">
+            <div class="template-icon">✍️</div>
+            <div class="template-name">కథ</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('poetry')">
+            <div class="template-icon">🎭</div>
+            <div class="template-name">కవిత్వం</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('essay')">
+            <div class="template-icon">📝</div>
+            <div class="template-name">వ్యాసం</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('blog')">
+            <div class="template-icon">💭</div>
+            <div class="template-name">బ్లాగ్</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('script')">
+            <div class="template-icon">🎬</div>
+            <div class="template-name">స్క్రిప్ట్</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDITOR -->
+    <div id="editor-container">
+      <div id="text-editor" contenteditable="true" oninput="updateStats()" onmouseup="checkSelection()"></div>
+      <div id="editor-status">
+        <div class="status-item">
+          <span id="status-words">పదాలు: 0</span>
+          <span id="status-chars">అక్షరాలు: 0</span>
+          <span id="status-read-time">చదవడం: 0 నిమి.</span>
+        </div>
+        <div class="status-item">
+          <span id="status-chapter">అధ్యాయం 1 / 1</span>
+          <span id="total-stats">మొత్తం: 0 పదాలు</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div id="sidebar-right">
+      <div class="right-tabs">
+        <div class="r-tab active" onclick="switchRTab('dictionary', this)">నిఘంటువు</div>
+        <div class="r-tab" onclick="switchRTab('reference', this)">సూచనలు</div>
+        <div class="r-tab" onclick="switchRTab('settings', this)">సెట్టింగ్స్</div>
+      </div>
+      
+      <!-- Dictionary Panel -->
+      <div id="panel-dictionary" class="right-panel active">
+        <div class="dict-search-box">
+          <input type="text" 
+                 class="dict-input" 
+                 id="dict-search-input" 
+                 placeholder="పదాన్ని వెతకండి..."
+                 onkeypress="if(event.key==='Enter') searchDictionary()">
+          <button class="dict-search-btn" onclick="searchDictionary()">వెతుకు</button>
+        </div>
+        <div class="dict-results" id="dict-results">
+          <div class="dict-empty">
+            <p>తెలుగు పదాల అర్థాలు తెలుసుకోవడానికి పైన వెతకండి.</p>
+            <div class="dict-quick-words">
+              <div class="dict-quick-word" onclick="quickSearch('పుస్తకం')">పుస్తకం</div>
+              <div class="dict-quick-word" onclick="quickSearch('రచన')">రచన</div>
+              <div class="dict-quick-word" onclick="quickSearch('కవిత')">కవిత</div>
+              <div class="dict-quick-word" onclick="quickSearch('కథ')">కథ</div>
+              <div class="dict-quick-word" onclick="quickSearch('భాష')">భాష</div>
+              <div class="dict-quick-word" onclick="quickSearch('విద్య')">విద్య</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Reference Panel -->
+      <div id="panel-reference" class="right-panel">
+        <div class="ref-panel-content">
+          <div class="ref-section">
+            <div class="ref-title">తెలుగు వ్యాకరణం</div>
+            <div class="ref-item" onclick="insertText('అ ఆ ఇ ఈ ఉ ఊ ఋ ౠ ఎ ఏ ఐ ఒ ఓ ఔ అం అః')">అచ్చులు (Vowels)</div>
+            <div class="ref-item" onclick="insertText('క ఖ గ ఘ ఙ చ ఛ జ ఝ ఞ ట ఠ డ ఢ ణ త థ ద ధ న ప ఫ బ భ మ య ర ల వ శ ష స హ ళ క్ష')">హల్లులు (Consonants)</div>
+            <div class="ref-item" onclick="insertText('ా ి ీ ు ూ ృ ౄ ె ే ై ొ ో ౌ ం ః')">గుణింతాలు (Diacritics)</div>
+          </div>
+          <div class="ref-section">
+            <div class="ref-title">సాధారణ పదబంధాలు</div>
+            <div class="ref-item" onclick="insertText('శుభోదయం')">శుభోదయం</div>
+            <div class="ref-item" onclick="insertText('నమస్కారం')">నమస్కారం</div>
+            <div class="ref-item" onclick="insertText('ధన్యవాదాలు')">ధన్యవాదాలు</div>
+            <div class="ref-item" onclick="insertText('క్షమించండి')">క్షమించండి</div>
+          </div>
+          <div class="ref-section">
+            <div class="ref-title">సంఖ్యలు</div>
+            <div class="ref-item" onclick="insertText('ఒకటి రెండు మూడు నాలుగు ఐదు ఆరు ఏడు ఎనిమిది తొమ్మిది పది')">1-10 సంఖ్యలు</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Settings Panel -->
+      <div id="panel-settings" class="right-panel">
+        <div class="setting-group">
+          <label class="setting-label">భాష (Language)</label>
+          <div class="lang-opts">
+            <button class="lang-opt active" onclick="setLang('te', this)">తెలుగు</button>
+            <button class="lang-opt" onclick="setLang('en', this)">English</button>
+            <button class="lang-opt" onclick="setLang('mix', this)">Mixed</button>
+          </div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">ఎగుమతి (Export)</label>
+          <button class="setting-btn" onclick="exportAs('txt')">📄 TXT</button>
+          <button class="setting-btn" onclick="exportAs('html')">🌐 HTML</button>
+          <button class="setting-btn" onclick="exportAs('pdf')">📕 PDF/Print</button>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">గణాంకాలు (Statistics)</label>
+          <button class="setting-btn" onclick="showStats()">📊 వివరాలు చూడండి</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar toggles -->
+    <button class="sidebar-toggle" id="left-toggle" onclick="toggleSidebar('left')">◀</button>
+    <button class="sidebar-toggle" id="right-toggle" onclick="toggleSidebar('right')">▶</button>
+  </div>
+</div>
+
+<!-- Notification -->
+<div id="notification"></div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Book Details Modal -->
+<div class="modal-overlay" id="book-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">పుస్తక వివరాలు</div>
+      <button class="modal-close" onclick="closeModal('book-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">పేరు (Title)</label>
+        <input type="text" class="form-input" id="book-title" placeholder="మీ పుస్తకం పేరు">
+      </div>
+      <div class="form-group">
+        <label class="form-label">రచయిత (Author)</label>
+        <input type="text" class="form-input" id="book-author" placeholder="మీ పేరు">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ప్రకారం (Genre)</label>
+        <select class="form-input" id="book-genre">
+          <option>నవల (Novel)</option>
+          <option>కథా సంపుటి (Story Collection)</option>
+          <option>కవితా సంపుటి (Poetry Collection)</option>
+          <option>వ్యాస సంపుటి (Essay Collection)</option>
+          <option>నాటకం (Drama)</option>
+          <option>జీవిత చరిత్ర (Biography)</option>
+          <option>ఇతరం (Other)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ప్రచురణకర్త (Publisher)</label>
+        <input type="text" class="form-input" id="book-publisher" placeholder="ప్రచురణకర్త పేరు">
+      </div>
+      <div class="form-group">
+        <label class="form-label">వివరణ (Description)</label>
+        <textarea class="form-textarea" id="book-description" placeholder="మీ పుస్తకం గురించి క్లుప్త వివరణ"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('book-modal')">రద్దు చేయి</button>
+      <button class="btn primary" onclick="saveBookDetails()">సేవ్ చేయి</button>
+    </div>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal-overlay" id="preview-modal">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div class="modal-title">ప్రివ్యూ</div>
+      <button class="modal-close" onclick="closeModal('preview-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="layout-buttons">
+        <button class="layout-btn active" onclick="renderPreview('classic')">క్లాసిక్</button>
+        <button class="layout-btn" onclick="renderPreview('modern')">మోడర్న్</button>
+        <button class="layout-btn" onclick="renderPreview('minimal')">మినిమల్</button>
+        <button class="layout-btn" onclick="renderPreview('elegant')">ఎలిగెంట్</button>
+      </div>
+      <div id="preview-content"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('preview-modal')">మూసివేయి</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Modal -->
+<div class="modal-overlay" id="stats-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">గణాంకాలు</div>
+      <button class="modal-close" onclick="closeModal('stats-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="stats-content"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('stats-modal')">మూసివేయి</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cover Design Modal -->
+<div class="modal-overlay" id="cover-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">కవర్ డిజైన్</div>
+      <button class="modal-close" onclick="closeModal('cover-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="cover-designer">
+        <div id="cover-preview">
+          <canvas id="cover-canvas"></canvas>
+        </div>
+        <div class="cover-controls">
+          <div>
+            <div class="cover-section-title">కవర్ స్టైల్ / ఆధారం</div>
+            <div class="cover-templates" id="cover-templates"></div>
+          </div>
+          <div>
+            <div class="cover-section-title">ఉచిత చిత్రాలు (Unsplash)</div>
+            <button class="btn" onclick="loadCoverImages()" style="width:100%;margin-bottom:8px;">🖼️ చిత్రాలు లోడ్ చేయి</button>
+            <div class="cover-images-grid" id="cover-images"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="downloadCover()">💾 డౌన్లోడ్</button>
+      <button class="btn" onclick="closeModal('cover-modal')">మూసివేయి</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// TELUGU DICTIONARY DATA
+// ═══════════════════════════════════════════════════════
+let teluguDictionary = {};
+let dictionaryLoaded = false;
+
+// Load dictionary from external JSON file
+async function loadDictionary() {
+  try {
+    const response = await fetch('telugu-dictionary.json');
+    if (!response.ok) {
+      throw new Error('Dictionary file not found');
+    }
+    teluguDictionary = await response.json();
+    dictionaryLoaded = true;
+    console.log('Dictionary loaded successfully:', Object.keys(teluguDictionary).length, 'words');
+  } catch (error) {
+    console.error('Error loading dictionary:', error);
+    showNotification('నిఘంటువు లోడ్ చేయడంలో సమస్య');
+    // Fallback to a few basic words if file not found
+    teluguDictionary = {
+      "పుస్తకం": {
+        meaning: "చదవడానికి లేదా చూడటానికి కాగితపు పేజీలతో కూడిన రచన",
+        pos: "నామవాచకం",
+        example: "నేను ప్రతిరోజు ఒక పుస్తకం చదువుతాను.",
+        synonyms: "గ్రంథం, పోథి, పుస్తి"
+      },
+      "రచన": {
+        meaning: "వ్రాయబడిన సాహిత్య కృతి లేదా రచయిత చేసిన పని",
+        pos: "నామవాచకం",
+        example: "ఆమె తన మొదటి రచనను ప్రచురించింది.",
+        synonyms: "కృతి, సృష్టి, రచయిత పని"
+      },
+      "కథ": {
+        meaning: "కల్పిత లేదా వాస్తవ సంఘటనల వృత్తాంతం",
+        pos: "నామవాచకం",
+        example: "పిల్లలకు కథలు చెప్పడం చాలా ఇష్టం.",
+        synonyms: "కథనం, కథనిక, చరిత"
+      }
+    };
+    dictionaryLoaded = true;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// DICTIONARY FUNCTIONS
+// ═══════════════════════════════════════════════════════
+async function searchDictionary() {
+  const searchTerm = document.getElementById('dict-search-input').value.trim();
+  if (!searchTerm) {
+    showNotification('పదాన్ని నమోదు చేయండి');
+    return;
+  }
+
+  const resultsDiv = document.getElementById('dict-results');
+  
+  // Load dictionary if not loaded yet
+  if (!dictionaryLoaded) {
+    resultsDiv.innerHTML = '<div class="dict-loading">నిఘంటువు లోడ్ అవుతోంది...</div>';
+    await loadDictionary();
+  }
+  
+  // Search in dictionary
+  const result = teluguDictionary[searchTerm];
+  
+  if (result) {
+    resultsDiv.innerHTML = `
+      <div class="dict-entry">
+        <div class="dict-word">${searchTerm}</div>
+        ${result.pos ? `<div class="dict-pos">${result.pos}</div>` : ''}
+        <div class="dict-meaning">${result.meaning}</div>
+        ${result.example ? `<div class="dict-example">ఉదాహరణ: ${result.example}</div>` : ''}
+        ${result.synonyms ? `<div class="dict-synonyms">పర్యాయపదాలు: ${result.synonyms}</div>` : ''}
+      </div>
+    `;
+  } else {
+    // Search for partial matches
+    const partialMatches = Object.keys(teluguDictionary).filter(word => 
+      word.includes(searchTerm) || searchTerm.includes(word)
+    );
+    
+    if (partialMatches.length > 0) {
+      resultsDiv.innerHTML = `
+        <div style="margin-bottom:16px;color:var(--text-muted);font-size:12px;">
+          "${searchTerm}" కొరకు సరైన అర్థం దొరకలేదు. సంబంధిత పదాలు:
+        </div>
+      ` + partialMatches.slice(0, 3).map(word => {
+        const data = teluguDictionary[word];
+        return `
+          <div class="dict-entry">
+            <div class="dict-word">${word}</div>
+            ${data.pos ? `<div class="dict-pos">${data.pos}</div>` : ''}
+            <div class="dict-meaning">${data.meaning}</div>
+            ${data.example ? `<div class="dict-example">ఉదాహరణ: ${data.example}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    } else {
+      resultsDiv.innerHTML = `
+        <div class="dict-error">
+          <p>"${searchTerm}" కొరకు నిఘంటువులో అర్థం దొరకలేదు.</p>
+          <p style="margin-top: 12px; font-size: 11px;">క్రింది పదాలు ప్రయత్నించండి:</p>
+          <div class="dict-quick-words" style="margin-top:12px;">
+            ${Object.keys(teluguDictionary).slice(0, 8).map(word => 
+              `<div class="dict-quick-word" onclick="quickSearch('${word}')">${word}</div>`
+            ).join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+}
+
+function quickSearch(word) {
+  document.getElementById('dict-search-input').value = word;
+  searchDictionary();
+}
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let chapters = [{ id: Date.now(), title: 'అధ్యాయం 1', content: '' }];
+let currentChapterIdx = 0;
+let currentFont = "'Noto Serif Telugu', serif";
+let currentLang = 'te';
+let bookData = {
+  title: '',
+  author: '',
+  genre: 'నవల (Novel)',
+  publisher: '',
+  description: ''
+};
+let coverData = { 
+  style: 'classic',
+  backgroundImage: null
+};
+let currentLayout = 'classic';
+
+// ═══════════════════════════════════════════════════════
+// COVER DESIGN
+// ═══════════════════════════════════════════════════════
+const coverStyles = [
+  { id: 'classic', name: 'క్లాసిక్', bg: '#8b4513', accent: '#c9933a', pattern: 'solid' },
+  { id: 'modern', name: 'మోడర్న్', bg: '#2c3e50', accent: '#3498db', pattern: 'gradient' },
+  { id: 'elegant', name: 'ఎలిగెంట్', bg: '#1a1a2e', accent: '#c9b0ff', pattern: 'solid' },
+  { id: 'vibrant', name: 'వైబ్రెంట్', bg: '#e74c3c', accent: '#f39c12', pattern: 'gradient' },
+  { id: 'nature', name: 'ప్రకృతి', bg: '#27ae60', accent: '#f1c40f', pattern: 'solid' },
+  { id: 'ocean', name: 'సముద్రం', bg: '#16a085', accent: '#ecf0f1', pattern: 'gradient' },
+  { id: 'sunset', name: 'సూర్యాస్తమయం', bg: '#d35400', accent: '#e8e8f0', pattern: 'gradient' },
+  { id: 'royal', name: 'రాజసి', bg: '#8e44ad', accent: '#f8d568', pattern: 'solid' }
+];
+
+let coverImages = [];
+
+function initCoverPreviews() {
+  const container = document.getElementById('cover-templates');
+  container.innerHTML = coverStyles.map((s, i) => `
+    <div class="cover-template ${i === 0 ? 'active' : ''}" 
+         style="background:${s.pattern === 'gradient' ? `linear-gradient(135deg, ${s.bg}, ${s.accent})` : s.bg}" 
+         onclick="selectCoverStyle('${s.id}')"
+         title="${s.name}">
+    </div>
+  `).join('');
+}
+
+function selectCoverStyle(styleId) {
+  coverData.style = styleId;
+  document.querySelectorAll('.cover-template').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  generateCover();
+}
+
+async function loadCoverImages() {
+  const container = document.getElementById('cover-images');
+  container.innerHTML = '<div class="cover-image-loading">చిత్రాలు లోడ్ అవుతున్నాయి...</div>';
+  
+  try {
+    // Using Unsplash API for free images
+    // Note: In production, you'd want to use your own Unsplash API key
+    const keywords = ['book', 'library', 'nature', 'abstract', 'art', 'vintage', 'texture', 'pattern'];
+    const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
+    
+    const response = await fetch(`https://source.unsplash.com/collection/1163637/400x600`);
+    
+    // Generate multiple image variations
+    const imageUrls = [
+      'https://source.unsplash.com/collection/1163637/400x600?sig=1',
+      'https://source.unsplash.com/collection/1163637/400x600?sig=2',
+      'https://source.unsplash.com/collection/1163637/400x600?sig=3',
+      'https://source.unsplash.com/collection/1163637/400x600?sig=4',
+      'https://source.unsplash.com/collection/1163637/400x600?sig=5',
+      'https://source.unsplash.com/collection/1163637/400x600?sig=6',
+      'https://source.unsplash.com/400x600/?book,library',
+      'https://source.unsplash.com/400x600/?nature,landscape',
+      'https://source.unsplash.com/400x600/?abstract,art',
+      'https://source.unsplash.com/400x600/?vintage,texture',
+      'https://source.unsplash.com/400x600/?pattern,design',
+      'https://source.unsplash.com/400x600/?minimal,simple'
+    ];
+    
+    container.innerHTML = imageUrls.map((url, idx) => `
+      <div class="cover-image-item" onclick="selectCoverImage('${url}')">
+        <img src="${url}" alt="Cover option ${idx + 1}" loading="lazy">
+      </div>
+    `).join('');
+    
+    showNotification('చిత్రాలు లోడ్ అయ్యాయి!');
+  } catch (error) {
+    container.innerHTML = '<div class="cover-image-loading">చిత్రాలు లోడ్ చేయడంలో లోపం.<br>మళ్ళీ ప్రయత్నించండి.</div>';
+  }
+}
+
+function selectCoverImage(imageUrl) {
+  coverData.backgroundImage = imageUrl;
+  document.querySelectorAll('.cover-image-item').forEach(item => item.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  generateCover();
+}
+
+function generateCover() {
+  const canvas = document.getElementById('cover-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 400;
+  canvas.height = 600;
+  
+  const style = coverStyles.find(s => s.id === coverData.style) || coverStyles[0];
+  
+  // Background
+  if (coverData.backgroundImage) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      // Draw image
+      ctx.drawImage(img, 0, 0, 400, 600);
+      
+      // Add overlay
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(0, 0, 400, 600);
+      
+      // Draw text on top
+      drawCoverText(ctx, style);
+    };
+    img.src = coverData.backgroundImage;
+  } else {
+    // Solid or gradient background
+    if (style.pattern === 'gradient') {
+      const gradient = ctx.createLinearGradient(0, 0, 400, 600);
+      gradient.addColorStop(0, style.bg);
+      gradient.addColorStop(1, style.accent);
+      ctx.fillStyle = gradient;
+    } else {
+      ctx.fillStyle = style.bg;
+    }
+    ctx.fillRect(0, 0, 400, 600);
+    
+    drawCoverText(ctx, style);
+  }
+}
+
+function drawCoverText(ctx, style) {
+  // Decorative borders
+  ctx.strokeStyle = coverData.backgroundImage ? '#ffffff' : style.accent;
+  ctx.lineWidth = 3;
+  ctx.strokeRect(30, 30, 340, 540);
+  ctx.strokeRect(40, 40, 320, 520);
+  
+  // Title
+  ctx.fillStyle = coverData.backgroundImage ? '#ffffff' : style.accent;
+  ctx.font = 'bold 32px "Noto Serif Telugu", serif';
+  ctx.textAlign = 'center';
+  const title = bookData.title || 'తెలుగు పుస్తకం';
+  wrapText(ctx, title, 200, 250, 320, 40);
+  
+  // Author
+  ctx.font = '20px "Noto Serif Telugu", serif';
+  ctx.fillText(bookData.author || 'రచయిత', 200, 400);
+  
+  // Ornament
+  ctx.font = '16px "Noto Sans Telugu", sans-serif';
+  ctx.fillText('◆', 200, 450);
+  
+  // Genre/Publisher at bottom
+  ctx.font = '14px "Noto Sans Telugu", sans-serif';
+  ctx.fillText(bookData.genre || 'నవల', 200, 520);
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ');
+  let line = '';
+  let lines = [];
+  
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && n > 0) {
+      lines.push(line);
+      line = words[n] + ' ';
+    } else {
+      line = testLine;
+    }
+  }
+  lines.push(line);
+  
+  const startY = y - ((lines.length - 1) * lineHeight) / 2;
+  lines.forEach((l, i) => {
+    ctx.fillText(l, x, startY + i * lineHeight);
+  });
+}
+
+function downloadCover() {
+  const canvas = document.getElementById('cover-canvas');
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${bookData.title || 'cover'}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showNotification('కవర్ డౌన్లోడ్ చేయబడింది!');
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CHAPTERS
+// ═══════════════════════════════════════════════════════
+function renderChapters() {
+  const list = document.getElementById('chapter-list');
+  list.innerHTML = chapters.map((ch, i) => `
+    <div class="chapter-item ${i === currentChapterIdx ? 'active' : ''}" onclick="switchChapter(${i})">
+      <div class="chapter-title">${ch.title}</div>
+      <div class="chapter-meta">
+        <span>పదాలు: ${countWords(i === currentChapterIdx ? document.getElementById('text-editor').innerText : (ch.content||'').replace(/<[^>]+>/g,''))}</span>
+      </div>
+      ${chapters.length > 1 ? `<button class="chapter-delete" onclick="event.stopPropagation(); deleteChapter(${i})">✕</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function addChapter() {
+  saveCurrentChapter();
+  const newCh = { id: Date.now(), title: `అధ్యాయం ${chapters.length+1}`, content: '' };
+  chapters.push(newCh);
+  currentChapterIdx = chapters.length - 1;
+  loadChapter();
+  renderChapters();
+  updateStats();
+  showNotification('కొత్త అధ్యాయం జోడించబడింది!');
+}
+
+function switchChapter(idx) {
+  if (idx === currentChapterIdx) return;
+  saveCurrentChapter();
+  currentChapterIdx = idx;
+  loadChapter();
+  renderChapters();
+  updateStats();
+}
+
+function deleteChapter(idx) {
+  if (chapters.length === 1) {
+    showNotification('కనీసం ఒక అధ్యాయం ఉండాలి!');
+    return;
+  }
+  if (confirm(`"${chapters[idx].title}" తొలగించాలా?`)) {
+    chapters.splice(idx, 1);
+    if (currentChapterIdx >= chapters.length) currentChapterIdx = chapters.length - 1;
+    loadChapter();
+    renderChapters();
+    updateStats();
+    showNotification('అధ్యాయం తొలగించబడింది');
+  }
+}
+
+function saveCurrentChapter() {
+  chapters[currentChapterIdx].content = document.getElementById('text-editor').innerHTML;
+}
+
+function loadChapter() {
+  document.getElementById('text-editor').innerHTML = chapters[currentChapterIdx].content || '';
+  updateEditorStats();
+}
+
+// ═══════════════════════════════════════════════════════
+// EDITOR COMMANDS
+// ═══════════════════════════════════════════════════════
+function execCmd(cmd, val) {
+  document.execCommand(cmd, false, val);
+  document.getElementById('text-editor').focus();
+}
+
+function changeFont(font) {
+  currentFont = font;
+  document.getElementById('text-editor').style.fontFamily = font;
+}
+
+function changeFontSize(size) {
+  document.getElementById('text-editor').style.fontSize = size + 'px';
+}
+
+function insertText(text) {
+  const editor = document.getElementById('text-editor');
+  editor.focus();
+  document.execCommand('insertText', false, text);
+}
+
+function checkSelection() {
+  // Could implement word suggestions here
+}
+
+// ═══════════════════════════════════════════════════════
+// TEMPLATES
+// ═══════════════════════════════════════════════════════
+function applyTemplate(type) {
+  const templates = {
+    novel: { title: 'అధ్యాయం 1: ప్రారంభం', content: '<p>ఈ కథ ప్రారంభం అవుతుంది...</p>' },
+    story: { title: 'కథ', content: '<p>ఒకప్పుడు...</p>' },
+    poetry: { title: 'కవిత 1', content: '<p style="text-align:center;"><i>ఇక్కడ మీ కవిత రాయండి...</i></p>' },
+    essay: { title: 'వ్యాసం', content: '<h2>పరిచయం</h2><p></p>' },
+    blog: { title: 'బ్లాగ్ పోస్ట్', content: '<h2>శీర్షిక</h2><p></p>' },
+    script: { title: 'దృశ్యం 1', content: '<p><b>పాత్ర 1:</b> </p>' }
+  };
+  const t = templates[type];
+  if (t) {
+    chapters[currentChapterIdx].title = t.title;
+    chapters[currentChapterIdx].content = t.content;
+    loadChapter();
+    renderChapters();
+    showNotification(`${t.title} టెంప్లేట్ వర్తింపబడింది!`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// STATS & COUNTING
+// ═══════════════════════════════════════════════════════
+function countWords(text) {
+  return text.trim().split(/\s+/).filter(w => w.length > 0).length;
+}
+
+function updateEditorStats() {
+  const text = document.getElementById('text-editor').innerText;
+  const words = countWords(text);
+  const chars = text.replace(/\s/g, '').length;
+  const readTime = Math.ceil(words / 200);
+  document.getElementById('status-words').textContent = `పదాలు: ${words}`;
+  document.getElementById('status-chars').textContent = `అక్షరాలు: ${chars}`;
+  document.getElementById('status-read-time').textContent = `చదవడం: ${readTime} నిమి.`;
+  document.getElementById('status-chapter').textContent = `అధ్యాయం ${currentChapterIdx+1} / ${chapters.length}`;
+}
+
+function updateTotalStats() {
+  let totalWords = 0;
+  chapters.forEach((ch, i) => {
+    const txt = i === currentChapterIdx ? document.getElementById('text-editor').innerText : (ch.content||'').replace(/<[^>]+>/g,'');
+    totalWords += countWords(txt);
+  });
+  document.getElementById('total-stats').textContent = `మొత్తం: ${totalWords} పదాలు`;
+}
+
+// ═══════════════════════════════════════════════════════
+// SAVE & LOAD
+// ═══════════════════════════════════════════════════════
+function saveAll() {
+  saveCurrentChapter();
+  const data = { chapters, bookData, coverData, currentChapterIdx };
+  localStorage.setItem('telugu-book', JSON.stringify(data));
+  showNotification('పుస్తకం సేవ్ చేయబడింది! 💾');
+}
+
+function loadAll() {
+  const saved = localStorage.getItem('telugu-book');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      chapters = data.chapters || chapters;
+      bookData = data.bookData || bookData;
+      coverData = data.coverData || coverData;
+      currentChapterIdx = data.currentChapterIdx || 0;
+      loadChapter();
+      renderChapters();
+      loadBookDetails();
+      updateStats();
+    } catch(e) { console.error(e); }
+  }
+}
+
+function saveBookDetails() {
+  bookData.title = document.getElementById('book-title').value;
+  bookData.author = document.getElementById('book-author').value;
+  bookData.genre = document.getElementById('book-genre').value;
+  bookData.publisher = document.getElementById('book-publisher').value;
+  bookData.description = document.getElementById('book-description').value;
+  closeModal('book-modal');
+  showNotification('పుస్తక వివరాలు సేవ్ చేయబడ్డాయి!');
+  saveAll();
+}
+
+function loadBookDetails() {
+  document.getElementById('book-title').value = bookData.title || '';
+  document.getElementById('book-author').value = bookData.author || '';
+  document.getElementById('book-genre').value = bookData.genre || 'నవల (Novel)';
+  document.getElementById('book-publisher').value = bookData.publisher || '';
+  document.getElementById('book-description').value = bookData.description || '';
+}
+
+// ═══════════════════════════════════════════════════════
+// PREVIEW
+// ═══════════════════════════════════════════════════════
+function renderPreview(layout) {
+  currentLayout = layout;
+  document.querySelectorAll('.layout-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  const layouts = {
+    classic: { pageColor: '#faf6ee', color: '#2a1e0f', font: 'Georgia, serif' },
+    modern: { pageColor: '#ffffff', color: '#333333', font: 'Arial, sans-serif' },
+    minimal: { pageColor: '#f5f5f5', color: '#1a1a1a', font: 'Helvetica, sans-serif' },
+    elegant: { pageColor: '#1a1a2e', color: '#e8e8f0', font: 'Garamond, serif' }
+  };
+  
+  const l = layouts[layout];
+  saveCurrentChapter();
+  
+  let allContent = '';
+  chapters.forEach((ch, i) => {
+    const content = ch.content || '';
+    allContent += `<h2 style="color:${l.color === '#e8e8f0' ? '#c9b0ff':'#8b4513'};margin-top:32px;font-size:22px;">${ch.title}</h2>${content}`;
+  });
+  
+  document.getElementById('preview-content').innerHTML = `
+    <div style="background:${l.pageColor};padding:48px;font-family:'Noto Serif Telugu',serif;color:${l.color};min-height:400px;">
+      ${bookData.title ? `<h1 style="text-align:center;font-size:28px;color:${l.color === '#e8e8f0' ? '#c9b0ff':'#c9933a'};margin-bottom:8px;">${bookData.title}</h1>` : ''}
+      ${bookData.author ? `<p style="text-align:center;font-size:14px;color:${l.color};margin-bottom:40px;">${bookData.author} రచించిన</p>` : ''}
+      <hr style="border-color:rgba(201,147,58,0.4);margin-bottom:40px;">
+      ${allContent}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════
+function exportAs(type) {
+  const title = bookData.title || 'తెలుగు పుస్తకం';
+  const author = bookData.author || 'రచయిత';
+  
+  if (type === 'txt') {
+    let content = `${title}\n${'='.repeat(title.length)}\nరచయిత: ${author}\n\n`;
+    chapters.forEach((ch, i) => {
+      const txt = i === currentChapterIdx ? (document.getElementById('text-editor').innerText) : (ch.content ? ch.content.replace(/<[^>]+>/g,'') : '');
+      content += `అధ్యాయం ${i+1}: ${ch.title}\n${'─'.repeat(40)}\n${txt}\n\n`;
+    });
+    downloadFile(content, `${title}.txt`, 'text/plain;charset=utf-8');
+    showNotification('TXT ఫైల్ సేవ్ అయింది!');
+  }
+  else if (type === 'html') {
+    const css = `body{font-family:'Noto Serif Telugu',serif;max-width:800px;margin:0 auto;padding:40px;background:#faf6ee;color:#2a1e0f;} h1{text-align:center;color:#c9933a;} h2{color:#8b4513;} p{line-height:2;}`;
+    let content = `<!DOCTYPE html><html lang="te"><head><meta charset="UTF-8"><title>${title}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@400;700&display=swap" rel="stylesheet"><style>${css}</style></head><body>`;
+    content += `<h1>${title}</h1><p style="text-align:center;">${author} రచించిన</p><hr>`;
+    chapters.forEach((ch, i) => {
+      const txt = i === currentChapterIdx ? document.getElementById('text-editor').innerHTML : (ch.content || '');
+      content += `<h2>అధ్యాయం ${i+1}: ${ch.title}</h2>${txt}<hr>`;
+    });
+    content += `</body></html>`;
+    downloadFile(content, `${title}.html`, 'text/html;charset=utf-8');
+    showNotification('HTML ఫైల్ సేవ్ అయింది!');
+  }
+  else if (type === 'pdf' || type === 'print') {
+    const css2 = `
+      @page{size:A4;margin:25mm 30mm;}
+      body{font-family:'Noto Serif Telugu',serif;font-size:14pt;line-height:2;color:#2a1e0f;}
+      h1{text-align:center;font-size:22pt;color:#8b4513;page-break-after:avoid;}
+      h2{font-size:16pt;color:#8b4513;page-break-before:always;page-break-after:avoid;}
+      .cover{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+      .cover h1{font-size:32pt;color:#c9933a;margin-bottom:20px;}
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@400;700&display=swap');
+    `;
+    let body = `<div class="cover"><h1>${title}</h1><p style="font-size:16pt;">${author}</p><p style="font-size:12pt;">${bookData.publisher||''}</p></div>`;
+    chapters.forEach((ch, i) => {
+      const txt = i === currentChapterIdx ? document.getElementById('text-editor').innerHTML : (ch.content || '');
+      body += `<h2>అధ్యాయం ${i+1}: ${ch.title}</h2>${txt}`;
+    });
+    const win = window.open('');
+    win.document.write(`<!DOCTYPE html><html lang="te"><head><meta charset="UTF-8"><title>${title}</title><style>${css2}</style></head><body>${body}</body></html>`);
+    win.document.close();
+    setTimeout(() => win.print(), 600);
+  }
+}
+
+function downloadFile(content, filename, mime) {
+  const blob = new Blob(['\uFEFF'+content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════════════════
+// STATS MODAL
+// ═══════════════════════════════════════════════════════
+function showStats() {
+  let totalWords = 0, totalChars = 0;
+  chapters.forEach((ch, i) => {
+    const txt = i === currentChapterIdx ? document.getElementById('text-editor').innerText : (ch.content||'').replace(/<[^>]+>/g,'');
+    totalWords += countWords(txt);
+    totalChars += txt.replace(/\s/g,'').length;
+  });
+  const stats = [
+    { label: 'మొత్తం అధ్యాయాలు', value: chapters.length },
+    { label: 'మొత్తం పదాలు', value: totalWords },
+    { label: 'మొత్తం అక్షరాలు', value: totalChars },
+    { label: 'చదవడానికి సమయం', value: Math.ceil(totalWords/200) + ' నిమి.' },
+    { label: 'సగటు అధ్యాయం పదాలు', value: chapters.length ? Math.round(totalWords/chapters.length) : 0 },
+    { label: 'పుస్తక పేరు', value: bookData.title || '—' },
+    { label: 'రచయిత', value: bookData.author || '—' },
+    { label: 'ప్రకారం', value: bookData.genre || '—' },
+  ];
+  document.getElementById('stats-content').innerHTML = stats.map(s => `
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:12px;text-align:center;">
+      <div style="font-size:22px;color:var(--gold-light);font-weight:bold;font-family:'Noto Serif Telugu',serif;">${s.value}</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${s.label}</div>
+    </div>
+  `).join('');
+  openModal('stats-modal');
+}
+
+// ═══════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('show');
+  if (id === 'cover-modal') { setTimeout(()=>{ initCoverPreviews(); generateCover(); },100); }
+  if (id === 'preview-modal') renderPreview(currentLayout);
+  if (id === 'stats-modal') showStats();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('show'); });
+});
+
+function switchSTab(panel, el) {
+  document.querySelectorAll('.sidebar-panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  document.querySelectorAll('.s-tab').forEach(t => t.classList.remove('active'));
+  const p = document.getElementById('panel-' + panel);
+  if (p) { p.classList.add('active'); p.style.display = 'flex'; }
+  el.classList.add('active');
+}
+
+function switchRTab(panel, el) {
+  document.querySelectorAll('#sidebar-right .right-panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  document.querySelectorAll('.r-tab').forEach(t => t.classList.remove('active'));
+  const p = document.getElementById('panel-' + panel);
+  if (p) { p.classList.add('active'); p.style.display = 'flex'; }
+  el.classList.add('active');
+}
+
+function toggleSidebar(side) {
+  const sb = document.getElementById('sidebar-' + side);
+  const toggle = document.getElementById(side === 'left' ? 'left-toggle' : 'right-toggle');
+  sb.classList.toggle('collapsed');
+  toggle.classList.toggle('collapsed');
+  toggle.textContent = sb.classList.contains('collapsed')
+    ? (side === 'left' ? '▶' : '◀')
+    : (side === 'left' ? '◀' : '▶');
+}
+
+function setLang(lang, el) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  const editor = document.getElementById('text-editor');
+  if (lang === 'en') {
+    editor.style.fontFamily = 'Georgia, serif';
+    editor.dataset.placeholder = 'Start writing in English here...';
+  } else {
+    editor.style.fontFamily = currentFont;
+    editor.dataset.placeholder = 'ఇక్కడ మీ రచన ప్రారంభించండి...';
+  }
+  showNotification(lang === 'te' ? 'తెలుగు మోడ్' : lang === 'en' ? 'English Mode' : 'Mixed Mode / మిశ్రమ మోడ్');
+}
+
+function showNotification(msg) {
+  const n = document.getElementById('notification');
+  n.textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 2500);
+}
+
+function updateStats() {
+  updateEditorStats();
+  updateTotalStats();
+}
+
+// Initialize
+const editor = document.getElementById('text-editor');
+const style = document.createElement('style');
+style.textContent = `#text-editor:empty:before{content:attr(data-placeholder);color:#b0a090;pointer-events:none;}`;
+document.head.appendChild(style);
+editor.dataset.placeholder = 'ఇక్కడ మీ రచన ప్రారంభించండి... (Start writing here...)';
+
+document.querySelectorAll('.sidebar-panel:not(.active)').forEach(p => p.style.display = 'none');
+document.querySelectorAll('.right-panel:not(.active)').forEach(p => p.style.display = 'none');
+document.getElementById('panel-chapters').style.display = 'flex';
+document.getElementById('panel-dictionary').style.display = 'flex';
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey)) {
+    if (e.key === 's') { e.preventDefault(); saveAll(); }
+    if (e.key === 'p') { e.preventDefault(); exportAs('print'); }
+  }
+});
+
+// Load on startup
+window.addEventListener('load', () => {
+  loadAll();
+  renderChapters();
+  updateStats();
+  // Preload dictionary in background
+  loadDictionary();
+});
+</script>
+</body>
+</html>
