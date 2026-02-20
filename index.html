@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>తెలుగు రచన - Telugu Writing Studio</title>
+<title>తెలుగు రచన సంపాదకుడు - Telugu Writing Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@300;400;500;600;700;900&family=Noto+Sans+Telugu:wght@300;400;500;600;700;900&family=Tiro+Telugu&family=Mandali&family=Ramabhadra&family=Gurajada&family=Tenali+Ramakrishna&family=Peddana&family=Ramaraja&family=Gidugu&family=Lakki+Reddy&family=NTR&family=Sree+Krushnadevaraya&family=Suranna&family=Suravaram&display=swap" rel="stylesheet">
-  <!-- Load Sanscript.js from a CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@indic-transliteration/sanscript@1.0.0/sanscript.min.js"></script>
 <link rel="stylesheet" href="styles.css">
 
 </head>
@@ -21,7 +19,7 @@
   <!-- TITLE BAR -->
   <div id="titlebar">
     <div>
-      <div class="title-logo">తెలుగు రచన </div>
+      <div class="title-logo">తెలుగు రచన సంపాదకుడు</div>
       <div class="title-sub">TELUGU WRITING STUDIO</div>
     </div>
     <div class="title-actions">
@@ -85,6 +83,14 @@
     <!-- Other -->
     <button class="tb-btn" onclick="insertHeading()" title="Insert Heading">H</button>
     <button class="tb-btn" onclick="execCmd('removeFormat')" title="Clear Formatting">✕</button>
+
+    <div class="tb-sep"></div>
+    <!-- Live transliteration toggle -->
+    <button class="tb-btn" id="translit-toggle-btn" onclick="toggleEditorTranslit()"
+      title="తెలుగు లిప్యంతరీకరణ — type English, get Telugu"
+      style="font-size:11px;padding:4px 10px;min-width:86px;background:var(--bg-card);">
+      🔤 EN→TE: OFF
+    </button>
   </div>
 
   <!-- MAIN CONTENT AREA -->
@@ -108,8 +114,8 @@
       <!-- Meta Panel -->
       <div id="panel-meta" class="sidebar-panel">
         <div class="form-group">
-          <label class="form-label">పుస్తకం పేరు</label>
-          <input type="text" class="form-input" id="book-title" placeholder="మీ పుస్తకం పేరు...">
+          <label class="form-label">పుస్తక పేరు</label>
+          <input type="text" class="form-input" id="book-title" placeholder="మీ పుస్తక పేరు...">
         </div>
         <div class="form-group">
           <label class="form-label">రచయిత</label>
@@ -277,7 +283,7 @@
   <div id="statusbar">
     <div id="total-stats"></div>
     <div style="flex:1"></div>
-    <div style="font-size:9px;color:var(--text-muted);">© తెలుగు రచన 2025</div>
+    <div style="font-size:9px;color:var(--text-muted);">© తెలుగు రచన సంపాదకుడు 2025</div>
   </div>
 </div>
 
@@ -292,7 +298,7 @@
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">పుస్తకం పేరు</label>
+        <label class="form-label">పుస్తక పేరు</label>
         <input type="text" class="form-input" id="modal-title">
       </div>
       <div class="form-group">
@@ -417,8 +423,26 @@
 <!-- Notification -->
 <div id="notification"></div>
 
-<!-- Sanscript.js: synchronous, lightweight, no async init needed -->
-<script src="https://cdn.jsdelivr.net/npm/sanscriptjs@0.0.1/sanscript.min.js"></script>
+<!-- Aksharamukha: exact CDN from official docs -->
+<script src="https://cdn.jsdelivr.net/npm/aksharamukha/dist/index.global.js"></script>
 <script src="script.js"></script>
+
+<!-- Module script: top-level await is required for Aksharamukha.new() -->
+<!-- This runs AFTER script.js so window.onAksharamukhaReady is defined  -->
+<script type="module">
+  try {
+    const instance = await Aksharamukha.new();
+    window._aksharamukha = instance;
+    console.log('Aksharamukha ready ✓');
+    // Signal script.js that the engine is available
+    if (typeof window._onAksharamukhaReady === 'function') {
+      window._onAksharamukhaReady(instance);
+    }
+  } catch(e) {
+    console.error('Aksharamukha failed to load:', e);
+    const btn = document.getElementById('translit-toggle-btn');
+    if (btn) btn.title = 'Transliteration unavailable — refresh page';
+  }
+</script>
 </body>
 </html>

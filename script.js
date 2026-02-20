@@ -495,11 +495,11 @@ function saveBookDetails() {
 }
 
 function loadBookDetails() {
-  document.getElementById('book-title').value = bookData.title || '';
-  document.getElementById('book-author').value = bookData.author || '';
-  document.getElementById('book-genre').value = bookData.genre || 'నవల (Novel)';
-  document.getElementById('book-publisher').value = bookData.publisher || '';
-  document.getElementById('book-description').value = bookData.description || '';
+  const f = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  f('book-title', bookData.title);
+  f('book-author', bookData.author);
+  f('book-genre', bookData.genre);
+  f('book-publisher', bookData.publisher);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -772,91 +772,223 @@ window.addEventListener('load', () => {
   initializeTransliteration();
 });
 
+
 // ═══════════════════════════════════════════════════════
-// SANSCRIPT TRANSLITERATION (synchronous — no async needed)
+// LIVE EDITOR TRANSLITERATION (English → Telugu as you type)
 // ═══════════════════════════════════════════════════════
 
-// Sanscript.js is fully synchronous — Sanscript.t() works the moment the
-// CDN script has loaded. No .new(), no await, no polling for a Promise.
-function initializeTransliteration() {
-  if (typeof Sanscript !== 'undefined') {
-    console.log('Sanscript library loaded successfully ✓');
-    const translitInput = document.getElementById('translitInput');
-    if (translitInput) {
-      translitInput.disabled = false;
-      translitInput.placeholder = 'e.g. raama, namaste, telugu';
-      translitInput.addEventListener('input', handleTransliteration);
+// State
+let editorTranslitEnabled = false;   // toggled by toolbar button
+let _wordBuffer = '';                 // accumulates current English word
+
+// Called by the <script type="module"> in index.html once Aksharamukha is ready
+window._onAksharamukhaReady = function(instance) {
+  window._aksharamukha = instance;
+  // If user already toggled ON before engine loaded, activate now
+  if (editorTranslitEnabled) {
+    _attachEditorTranslit();
+    showNotification('తెలుగు టైపింగ్ సిద్ధమైంది ✓');
+  }
+};
+
+// Toolbar button — toggles inline transliteration on/off
+function toggleEditorTranslit() {
+  editorTranslitEnabled = !editorTranslitEnabled;
+  const btn = document.getElementById('translit-toggle-btn');
+
+  if (editorTranslitEnabled) {
+    if (!window._aksharamukha) {
+      showNotification('ఇంజిన్ లోడ్ అవుతోంది, వేచి ఉండండి...');
+      btn.textContent = '🔤 EN→TE: లోడ్...';
+      btn.style.color = '#f39c12';
+    } else {
+      _attachEditorTranslit();
+      btn.textContent = '🔤 EN→TE: ON';
+      btn.style.color = '#2ecc71';
+      showNotification('తెలుగు టైపింగ్ ఆన్ — English లో టైప్ చేయండి');
     }
   } else {
-    // Script tag not yet executed (slow network) — retry shortly
-    console.warn('Sanscript not yet available, retrying...');
-    setTimeout(initializeTransliteration, 500);
+    _detachEditorTranslit();
+    btn.textContent = '🔤 EN→TE: OFF';
+    btn.style.color = '';
+    _wordBuffer = '';
+    showNotification('తెలుగు టైపింగ్ ఆఫ్');
   }
 }
 
-// Fires on every keystroke — fully synchronous, instant output
-function handleTransliteration(event) {
-  const inputText = event.target.value;
-  const outputDiv = document.getElementById('translitOutput');
+function _attachEditorTranslit() {
+  const ed = document.getElementById('text-editor');
+  ed.removeEventListener('keydown', _translitKeydown);
+  ed.addEventListener('keydown', _translitKeydown);
+  // Visual cue
+  ed.style.outline = '2px solid rgba(201,147,58,0.5)';
+  const btn = document.getElementById('translit-toggle-btn');
+  if (btn) { btn.textContent = '🔤 EN→TE: ON'; btn.style.color = '#2ecc71'; }
+}
 
-  if (!inputText.trim()) {
-    outputDiv.textContent = '';
+function _detachEditorTranslit() {
+  const ed = document.getElementById('text-editor');
+  ed.removeEventListener('keydown', _translitKeydown);
+  ed.style.outline = '';
+}
+
+// Keydown handler — intercepts each keystroke in the editor
+function _translitKeydown(e) {
+  if (!editorTranslitEnabled || !window._aksharamukha) return;
+
+  const triggerKeys = [' ', 'Enter', '.', ',', '!', '?', ';', ':', '-', '(', ')', '"', "'"];
+  const isNavigation = e.ctrlKey || e.metaKey || e.altKey ||
+    ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End',
+     'PageUp','PageDown','Tab','Escape','F1','F2','F3','F4','F5',
+     'F6','F7','F8','F9','F10','F11','F12'].includes(e.key);
+
+  if (isNavigation) {
+    // Flush buffer on navigation
+    if (_wordBuffer) { _wordBuffer = ''; }
     return;
   }
 
-  if (typeof Sanscript !== 'undefined') {
-    try {
-      // Sanscript.t(text, fromScheme, toScheme)
-      // 'itrans'          — rAma, namaste, telugu, kRRiShNa
-      // 'itrans_dravidian'— same but treats short e/o correctly for Dravidian
-      const scheme = document.getElementById('translitScheme')?.value || 'itrans_dravidian';
-      const teluguText = Sanscript.t(inputText, scheme, 'telugu');
-      outputDiv.textContent = teluguText;
-    } catch (error) {
-      console.error('Transliteration error:', error);
-      outputDiv.textContent = 'మార్పిడి విఫలమైంది';
+  if (e.key === 'Backspace') {
+    // Trim last char from buffer
+    _wordBuffer = _wordBuffer.slice(0, -1);
+    return; // let browser handle DOM deletion normally
+  }
+
+  if (triggerKeys.includes(e.key)) {
+    // Commit current buffer as Telugu, then insert the trigger character
+    if (_wordBuffer.trim()) {
+      e.preventDefault();
+      _commitWord(_wordBuffer, e.key === ' ' ? ' ' : e.key + ' ');
+      _wordBuffer = '';
     }
-  } else {
-    outputDiv.textContent = 'లైబ్రరీ లోడ్ అవుతోంది...';
+    // else let the space/punctuation fall through naturally
+    return;
+  }
+
+  // Regular printable character — add to buffer and suppress default
+  if (e.key.length === 1) {
+    e.preventDefault();
+    _wordBuffer += e.key;
+    // Show live preview of current buffer via inline pending span
+    _showPendingWord(_wordBuffer);
   }
 }
 
-// Insert the transliterated Telugu text into the editor at cursor position
-function insertTranslitText() {
-  const outputDiv = document.getElementById('translitOutput');
-  const teluguText = outputDiv.textContent.trim();
+// Show a live "ghost" of what the current word will become
+let _pendingNode = null;
+function _showPendingWord(buffer) {
+  // Just show the raw buffer — we only transliterate on word commit
+  // so the user can see what they're typing
+  _ensurePendingNode();
+  _pendingNode.textContent = buffer;
+}
 
-  const invalid = ['', 'మార్పిడి విఫలమైంది', 'లైబ్రరీ లోడ్ అవుతోంది...'];
-  if (!teluguText || invalid.includes(teluguText)) {
-    showNotification('ముందుగా English టెక్స్ట్ టైప్ చేయండి');
-    return;
+function _ensurePendingNode() {
+  if (_pendingNode && _pendingNode.isConnected) return;
+  const ed = document.getElementById('text-editor');
+  // Remove old if dangling
+  if (_pendingNode) _pendingNode.remove();
+  _pendingNode = document.createElement('span');
+  _pendingNode.id = '_translit_pending';
+  _pendingNode.style.cssText = 'color:#c9933a;font-style:italic;';
+  // Insert at cursor
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount > 0) {
+    const range = sel.getRangeAt(0);
+    range.collapse(true);
+    range.insertNode(_pendingNode);
+    // Move cursor inside the span
+    range.selectNodeContents(_pendingNode);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    ed.appendChild(_pendingNode);
   }
+}
 
-  const editor = document.getElementById('text-editor');
-  editor.focus();
+// Replace the pending span with actual Telugu text + suffix
+async function _commitWord(romanWord, suffix) {
+  try {
+    const telugu = await window._aksharamukha.process('autodetect', 'Telugu', romanWord);
+    const final = telugu + (suffix || '');
 
-  const inserted = document.execCommand('insertText', false, teluguText + ' ');
-  if (!inserted) {
-    const sel = window.getSelection();
-    if (sel && sel.rangeCount > 0) {
-      const range = sel.getRangeAt(0);
-      range.deleteContents();
-      const node = document.createTextNode(teluguText + ' ');
-      range.insertNode(node);
-      range.setStartAfter(node);
+    // Remove pending span and insert Telugu text in its place
+    if (_pendingNode && _pendingNode.isConnected) {
+      const ed = document.getElementById('text-editor');
+      const textNode = document.createTextNode(final);
+      _pendingNode.replaceWith(textNode);
+      _pendingNode = null;
+      // Move cursor after inserted text
+      const sel = window.getSelection();
+      const range = document.createRange();
+      range.setStartAfter(textNode);
       range.collapse(true);
       sel.removeAllRanges();
       sel.addRange(range);
     } else {
-      editor.innerHTML += teluguText + ' ';
+      // Fallback — just insert at cursor
+      document.execCommand('insertText', false, final);
     }
+    updateStats();
+    saveCurrentChapter();
+  } catch(err) {
+    console.error('Commit transliteration error:', err);
+    // On error, insert the raw roman text so nothing is lost
+    document.execCommand('insertText', false, romanWord + (suffix || ''));
+    _wordBuffer = '';
   }
+}
 
+// ── Side panel transliteration tool (kept from before) ──────────────────────
+
+// Initialize sidebar translit input — wired up once engine is ready
+window._onAksharamukhaReady_sidebar = window._onAksharamukhaReady;
+window._onAksharamukhaReady = function(instance) {
+  window._aksharamukha = instance;
+  // Sidebar input
+  const input = document.getElementById('translitInput');
+  if (input) {
+    input.disabled = false;
+    input.placeholder = 'e.g. raama, krishNa, telugu';
+    input.addEventListener('input', _sidebarTranslit);
+  }
+  // Editor translit if already toggled on
+  if (editorTranslitEnabled) {
+    _attachEditorTranslit();
+    showNotification('తెలుగు టైపింగ్ సిద్ధమైంది ✓');
+  }
+};
+
+async function _sidebarTranslit(e) {
+  const text = e.target.value.trim();
+  const out = document.getElementById('translitOutput');
+  if (!out) return;
+  if (!text) { out.textContent = ''; return; }
+  try {
+    const result = await window._aksharamukha.process('autodetect', 'Telugu', text);
+    out.textContent = result;
+  } catch(err) {
+    out.textContent = 'మార్పిడి విఫలమైంది';
+  }
+}
+
+function insertTranslitText() {
+  const out = document.getElementById('translitOutput');
+  const text = out ? out.textContent.trim() : '';
+  if (!text || text === 'మార్పిడి విఫలమైంది') {
+    showNotification('ముందుగా English టెక్స్ట్ టైప్ చేయండి');
+    return;
+  }
+  const ed = document.getElementById('text-editor');
+  ed.focus();
+  document.execCommand('insertText', false, text + ' ');
   updateStats();
   saveCurrentChapter();
   document.getElementById('translitInput').value = '';
-  outputDiv.textContent = '';
+  out.textContent = '';
   showNotification('తెలుగు టెక్స్ట్ చేర్చబడింది ✓');
 }
 
-
+// Stub — actual init happens via module script → window._onAksharamukhaReady
+function initializeTransliteration() {}
