@@ -792,6 +792,33 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: 
     z-index: 101;
   }
 }
+
+/* ═══ TRANSLITERATION SECTION ═══ */
+#translitInput {
+  font-family: 'Courier New', monospace;
+  background: var(--bg-editor);
+  color: #333;
+  border: 1px solid var(--border-gold);
+}
+
+#translitInput:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: -1px;
+}
+
+#translitOutput {
+  font-family: 'Nirmala UI', 'Gautami', 'Noto Serif Telugu', serif !important;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+#translitOutput:empty::before {
+  content: 'తెలుగు అక్షరాలు ఇక్కడ కనిపిస్తాయి...';
+  color: #999;
+  font-size: 14px;
+  font-style: italic;
+}
+
 </style>
     let content = `<!DOCTYPE html><html lang="te"><head><meta charset="UTF-8"><title>${title}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@400;700&display=swap" rel="stylesheet"><style>${css}</style></head><body>`;
     content += `<h1>${title}</h1><p style="text-align:center;">${author} రచించిన</p><hr>`;

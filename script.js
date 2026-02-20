@@ -718,4 +718,96 @@ window.addEventListener('load', () => {
   updateStats();
   // Preload dictionary in background
   loadDictionary();
+  // Initialize transliteration
+  initializeTransliteration();
 });
+
+// ═══════════════════════════════════════════════════════
+// AKSHARAMUKHA TRANSLITERATION
+// ═══════════════════════════════════════════════════════
+let aksharamukhaInstance = null;
+
+// Initialize Aksharamukha asynchronously
+async function initializeTransliteration() {
+  try {
+    // Wait for Aksharamukha library to be available
+    if (typeof Aksharamukha !== 'undefined') {
+      aksharamukhaInstance = await Aksharamukha.new();
+      console.log('Aksharamukha initialized successfully');
+      
+      // Add event listener to input field
+      const translitInput = document.getElementById('translitInput');
+      if (translitInput) {
+        translitInput.addEventListener('input', handleTransliteration);
+        console.log('Transliteration input listener added');
+      }
+    } else {
+      console.warn('Aksharamukha library not loaded yet, retrying...');
+      setTimeout(initializeTransliteration, 500);
+    }
+  } catch (error) {
+    console.error('Error initializing Aksharamukha:', error);
+    showNotification('ట్రాన్స్‌లిటరేషన్ లోడ్ చేయడంలో సమస్య');
+  }
+}
+
+// Handle transliteration as user types
+function handleTransliteration(event) {
+  const inputText = event.target.value;
+  const outputDiv = document.getElementById('translitOutput');
+  
+  if (!inputText.trim()) {
+    outputDiv.textContent = '';
+    return;
+  }
+  
+  if (aksharamukhaInstance) {
+    try {
+      // Convert ITRANS to Telugu
+      const teluguText = aksharamukhaInstance.convert(inputText, 'ITRANS', 'Telugu');
+      outputDiv.textContent = teluguText;
+    } catch (error) {
+      console.error('Transliteration error:', error);
+      outputDiv.textContent = 'మార్పిడి విఫలమైంది';
+    }
+  } else {
+    outputDiv.textContent = 'లైబ్రరీ లోడ్ అవుతోంది...';
+  }
+}
+
+// Insert transliterated text into editor
+function insertTranslitText() {
+  const outputDiv = document.getElementById('translitOutput');
+  const teluguText = outputDiv.textContent;
+  
+  if (!teluguText || teluguText === 'లైబ్రరీ లోడ్ అవుతోంది...' || teluguText === 'మార్పిడి విఫలమైంది') {
+    showNotification('ముందుగా టెక్స్ట్ టైప్ చేయండి');
+    return;
+  }
+  
+  // Insert into editor
+  const editor = document.getElementById('text-editor');
+  if (editor) {
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    const textNode = document.createTextNode(teluguText + ' ');
+    range.insertNode(textNode);
+    
+    // Move cursor after inserted text
+    range.setStartAfter(textNode);
+    range.setEndAfter(textNode);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    
+    // Update stats and save
+    updateStats();
+    autoSave();
+    
+    // Clear input
+    document.getElementById('translitInput').value = '';
+    outputDiv.textContent = '';
+    
+    showNotification('టెక్స్ట్ చేర్చబడింది');
+  }
+}
+
