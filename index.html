@@ -7,8 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@300;400;500;600;700;900&family=Noto+Sans+Telugu:wght@300;400;500;600;700;900&family=Tiro+Telugu&family=Mandali&family=Ramabhadra&family=Gurajada&family=Tenali+Ramakrishna&family=Peddana&family=Ramaraja&family=Gidugu&family=Lakki+Reddy&family=NTR&family=Sree+Krushnadevaraya&family=Suranna&family=Suravaram&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<!-- Aksharamukha Transliteration Library (correct CDN) -->
-<script src="https://cdn.jsdelivr.net/npm/aksharamukha@latest/dist/index.global.js"></script>
+
 </head>
 <body>
 
@@ -201,7 +200,7 @@
             </div>
             <div class="form-group">
               <label class="form-label" style="font-size:11px;margin-bottom:4px;">English / Roman Input</label>
-              <input type="text" class="form-input" id="translitInput" placeholder="e.g.  rAma, namasthe, kRRiShNa" style="font-size:14px;padding:8px;">
+              <input type="text" class="form-input" id="translitInput" placeholder="లోడ్ అవుతోంది…" disabled style="font-size:14px;padding:8px;">
             </div>
             <div class="form-group" style="margin-top:8px;">
               <label class="form-label" style="font-size:11px;margin-bottom:4px;">Telugu Output</label>
@@ -413,42 +412,8 @@
 <!-- Notification -->
 <div id="notification"></div>
 
+<!-- Aksharamukha: pinned stable version, loaded before script.js -->
+<script src="https://cdn.jsdelivr.net/npm/aksharamukha@2.0.0/dist/index.global.js"></script>
 <script src="script.js"></script>
-
-<!--
-  Aksharamukha MUST be initialised with top-level await inside a module script.
-  Regular scripts (and async functions called from them) cannot use top-level
-  await, which is why the previous polling loop ran 40 times and gave up.
-  This module block runs after script.js has defined onAksharamukhaReady(),
-  awaits the instance, then hands it over.
--->
-<script type="module">
-  const outputDiv = document.getElementById('translitOutput');
-  const translitInput = document.getElementById('translitInput');
-
-  // Disable input while loading so the user sees the placeholder
-  if (translitInput) {
-    translitInput.disabled = true;
-    translitInput.placeholder = 'లోడ్ అవుతోంది…';
-  }
-  if (outputDiv) outputDiv.textContent = '';
-
-  try {
-    // Top-level await — works only in module scripts
-    const aksharamukha = await Aksharamukha.new();
-    // Hand the live instance to script.js
-    onAksharamukhaReady(aksharamukha);
-  } catch (err) {
-    console.error('Aksharamukha failed to load:', err);
-    if (outputDiv) {
-      outputDiv.textContent = 'లైబ్రరీ లోడ్ కాలేదు — పేజీని రిఫ్రెష్ చేయండి';
-      outputDiv.style.color = '#c0392b';
-    }
-    if (translitInput) {
-      translitInput.disabled = false;
-      translitInput.placeholder = 'లోడ్ విఫలమైంది';
-    }
-  }
-</script>
 </body>
 </html>

@@ -775,64 +775,66 @@ window.addEventListener('load', () => {
 // ═══════════════════════════════════════════════════════
 // AKSHARAMUKHA TRANSLITERATION
 // ═══════════════════════════════════════════════════════
-// aksharamukhaInstance is set by the <script type="module"> in index.html
-// which uses top-level await — the only correct way to call Aksharamukha.new().
-// Regular scripts cannot use top-level await, which is why the previous polling
-// loop never worked.
-window.aksharamukhaInstance = null;
-let translitDebounceTimer = null;
 
-// Called by the module script in index.html once the instance is ready
-function onAksharamukhaReady(instance) {
-  window.aksharamukhaInstance = instance;
-  const outputDiv = document.getElementById('translitOutput');
-  if (outputDiv) {
-    outputDiv.textContent = '';
-    outputDiv.dataset.ready = 'true';
-  }
-  console.log('Aksharamukha ready ✓');
+let aksharamukha;           // global instance — set after Aksharamukha.new() resolves
+let aksharamukhaReady = false;
 
-  const translitInput = document.getElementById('translitInput');
-  if (translitInput) {
-    translitInput.disabled = false;
-    translitInput.placeholder = 'e.g.  rAma, namasthe, kRRiShNa';
-    translitInput.addEventListener('input', () => {
-      clearTimeout(translitDebounceTimer);
-      translitDebounceTimer = setTimeout(() => handleTransliteration(translitInput.value), 150);
-    });
+// Called from window load — retries every 500ms until Aksharamukha CDN script
+// has finished executing and the global is available, then calls .new() once.
+async function initializeTransliteration() {
+  try {
+    if (typeof Aksharamukha !== 'undefined') {
+      aksharamukha = await Aksharamukha.new();
+      aksharamukhaReady = true;
+      console.log('Aksharamukha instance ready ✓');
+
+      const translitInput = document.getElementById('translitInput');
+      if (translitInput) {
+        translitInput.disabled = false;
+        translitInput.placeholder = 'e.g. rAma, namasthe, telugu';
+        translitInput.addEventListener('input', handleTransliteration);
+      }
+    } else {
+      // CDN script hasn't finished parsing yet — try again shortly
+      setTimeout(initializeTransliteration, 500);
+    }
+  } catch (error) {
+    console.error('Aksharamukha initialization failed:', error);
+    const outputDiv = document.getElementById('translitOutput');
+    if (outputDiv) outputDiv.textContent = 'లోడ్ విఫలమైంది — రిఫ్రెష్ చేయండి';
   }
 }
 
-// Perform transliteration — called on each debounced input event
-async function handleTransliteration(inputText) {
+// Fires on every input event — async because .process() returns a Promise
+async function handleTransliteration(event) {
+  const inputText = event.target.value;
   const outputDiv = document.getElementById('translitOutput');
+
   if (!inputText.trim()) {
     outputDiv.textContent = '';
-    outputDiv.style.color = '';
     return;
   }
-  if (!window.aksharamukhaInstance) {
+
+  if (aksharamukhaReady && aksharamukha) {
+    try {
+      const source = document.getElementById('translitScheme')?.value || 'ITRANS';
+      const teluguText = await aksharamukha.process(source, 'Telugu', inputText);
+      outputDiv.textContent = teluguText;
+    } catch (error) {
+      console.error('Transliteration error:', error);
+      outputDiv.textContent = 'మార్పిడి విఫలమైంది';
+    }
+  } else {
     outputDiv.textContent = 'లోడ్ అవుతోంది…';
-    return;
-  }
-  try {
-    const source = document.getElementById('translitScheme')?.value || 'ITRANS';
-    const result = await window.aksharamukhaInstance.process(source, 'Telugu', inputText);
-    outputDiv.textContent = result;
-    outputDiv.style.color = '';
-  } catch (err) {
-    console.error('Transliteration error:', err);
-    outputDiv.textContent = 'మార్పిడి విఫలమైంది';
-    outputDiv.style.color = '#c0392b';
   }
 }
 
-// Insert the transliterated Telugu text into the main editor
+// Insert transliterated Telugu text into the main editor at cursor position
 function insertTranslitText() {
   const outputDiv = document.getElementById('translitOutput');
   const teluguText = outputDiv.textContent.trim();
 
-  const invalid = ['', 'లోడ్ అవుతోంది…', 'మార్పిడి విఫలమైంది', 'లోడ్ అవుతోంది...'];
+  const invalid = ['', 'లోడ్ అవుతోంది…', 'మార్పిడి విఫలమైంది', 'లోడ్ విఫలమైంది — రిఫ్రెష్ చేయండి'];
   if (!teluguText || invalid.includes(teluguText)) {
     showNotification('ముందుగా English టెక్స్ట్ టైప్ చేయండి');
     return;
@@ -841,8 +843,10 @@ function insertTranslitText() {
   const editor = document.getElementById('text-editor');
   editor.focus();
 
+  // execCommand works reliably for contenteditable
   const inserted = document.execCommand('insertText', false, teluguText + ' ');
   if (!inserted) {
+    // Fallback via Selection API
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) {
       const range = sel.getRangeAt(0);
@@ -864,8 +868,5 @@ function insertTranslitText() {
   outputDiv.textContent = '';
   showNotification('తెలుగు టెక్స్ట్ చేర్చబడింది ✓');
 }
-
-// Stub so the load handler doesn't throw — actual init is in the module script
-function initializeTransliteration() {}
 
 
