@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@300;400;500;600;700;900&family=Noto+Sans+Telugu:wght@300;400;500;600;700;900&family=Tiro+Telugu&family=Mandali&family=Ramabhadra&family=Gurajada&family=Tenali+Ramakrishna&family=Peddana&family=Ramaraja&family=Gidugu&family=Lakki+Reddy&family=NTR&family=Sree+Krushnadevaraya&family=Suranna&family=Suravaram&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<!-- Aksharamukha Transliteration Library -->
-<script src="https://aksharamukha.appspot.com/api/js"></script>
+<!-- Aksharamukha Transliteration Library (correct CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/aksharamukha@latest/dist/index.global.js"></script>
 </head>
 <body>
 
@@ -189,17 +189,35 @@
       <!-- Reference Panel -->
       <div id="panel-reference" class="right-panel">
         <div class="ref-panel-content">
-          <!-- Transliteration Tool -->
           <div class="ref-section" style="background:var(--bg-card);padding:12px;border-radius:8px;margin-bottom:16px;">
             <div class="ref-title" style="margin-bottom:8px;">🔤 ట్రాన్స్‌లిటరేషన్</div>
+            <div class="form-group" style="margin-bottom:6px;">
+              <label class="form-label" style="font-size:11px;margin-bottom:4px;">Input Scheme</label>
+              <select class="form-input" id="translitScheme" style="font-size:12px;padding:4px 6px;">
+                <option value="HK">Harvard-Kyoto (HK) — rAma, kRRiShNa</option>
+                <option value="ITRANS">ITRANS — rAma, kRRiShNa</option>
+                <option value="SLP1">SLP1 — rAma, kfzRa</option>
+              </select>
+            </div>
             <div class="form-group">
-              <label class="form-label" style="font-size:11px;margin-bottom:4px;">English (ITRANS)</label>
-              <input type="text" class="form-input" id="translitInput" placeholder="Type in English (e.g., namaste)" style="font-size:14px;padding:8px;">
+              <label class="form-label" style="font-size:11px;margin-bottom:4px;">English / Roman Input</label>
+              <input type="text" class="form-input" id="translitInput" placeholder="e.g.  rAma, namasthe, kRRiShNa" style="font-size:14px;padding:8px;">
             </div>
             <div class="form-group" style="margin-top:8px;">
               <label class="form-label" style="font-size:11px;margin-bottom:4px;">Telugu Output</label>
-              <div id="translitOutput" style="background:var(--bg-editor);padding:10px;border-radius:4px;min-height:40px;font-family:'Nirmala UI','Gautami','Noto Serif Telugu',serif;font-size:18px;color:#333;"></div>
+              <div id="translitOutput" style="background:var(--bg-editor);padding:10px;border-radius:4px;min-height:40px;font-family:'Nirmala UI','Gautami','Noto Serif Telugu',serif;font-size:20px;color:#333;letter-spacing:1px;"></div>
             </div>
+            <!-- Quick reference -->
+            <details style="margin-top:8px;font-size:11px;color:var(--text-muted);">
+              <summary style="cursor:pointer;">HK Quick Reference</summary>
+              <div style="margin-top:6px;line-height:1.8;">
+                <b>Vowels:</b> a A i I u U e E o O ai au<br>
+                <b>Long:</b> uppercase (A=ఆ, I=ఈ, U=ఊ)<br>
+                <b>Retroflex:</b> T Th D Dh N<br>
+                <b>Sibilants:</b> z S s h<br>
+                <b>Visarga:</b> H &nbsp; <b>Anusvara:</b> M
+              </div>
+            </details>
             <button class="setting-btn" onclick="insertTranslitText()" style="width:100%;margin-top:8px;font-size:12px;">✓ ఎడిటర్‌లో చేర్చు</button>
           </div>
 
