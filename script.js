@@ -773,40 +773,29 @@ window.addEventListener('load', () => {
 });
 
 // ═══════════════════════════════════════════════════════
-// AKSHARAMUKHA TRANSLITERATION
+// SANSCRIPT TRANSLITERATION (synchronous — no async needed)
 // ═══════════════════════════════════════════════════════
 
-let aksharamukha;           // global instance — set after Aksharamukha.new() resolves
-let aksharamukhaReady = false;
-
-// Called from window load — retries every 500ms until Aksharamukha CDN script
-// has finished executing and the global is available, then calls .new() once.
-async function initializeTransliteration() {
-  try {
-    if (typeof Aksharamukha !== 'undefined') {
-      aksharamukha = await Aksharamukha.new();
-      aksharamukhaReady = true;
-      console.log('Aksharamukha instance ready ✓');
-
-      const translitInput = document.getElementById('translitInput');
-      if (translitInput) {
-        translitInput.disabled = false;
-        translitInput.placeholder = 'e.g. rAma, namasthe, telugu';
-        translitInput.addEventListener('input', handleTransliteration);
-      }
-    } else {
-      // CDN script hasn't finished parsing yet — try again shortly
-      setTimeout(initializeTransliteration, 500);
+// Sanscript.js is fully synchronous — Sanscript.t() works the moment the
+// CDN script has loaded. No .new(), no await, no polling for a Promise.
+function initializeTransliteration() {
+  if (typeof Sanscript !== 'undefined') {
+    console.log('Sanscript library loaded successfully ✓');
+    const translitInput = document.getElementById('translitInput');
+    if (translitInput) {
+      translitInput.disabled = false;
+      translitInput.placeholder = 'e.g. raama, namaste, telugu';
+      translitInput.addEventListener('input', handleTransliteration);
     }
-  } catch (error) {
-    console.error('Aksharamukha initialization failed:', error);
-    const outputDiv = document.getElementById('translitOutput');
-    if (outputDiv) outputDiv.textContent = 'లోడ్ విఫలమైంది — రిఫ్రెష్ చేయండి';
+  } else {
+    // Script tag not yet executed (slow network) — retry shortly
+    console.warn('Sanscript not yet available, retrying...');
+    setTimeout(initializeTransliteration, 500);
   }
 }
 
-// Fires on every input event — async because .process() returns a Promise
-async function handleTransliteration(event) {
+// Fires on every keystroke — fully synchronous, instant output
+function handleTransliteration(event) {
   const inputText = event.target.value;
   const outputDiv = document.getElementById('translitOutput');
 
@@ -815,26 +804,29 @@ async function handleTransliteration(event) {
     return;
   }
 
-  if (aksharamukhaReady && aksharamukha) {
+  if (typeof Sanscript !== 'undefined') {
     try {
-      const source = document.getElementById('translitScheme')?.value || 'ITRANS';
-      const teluguText = await aksharamukha.process(source, 'Telugu', inputText);
+      // Sanscript.t(text, fromScheme, toScheme)
+      // 'itrans'          — rAma, namaste, telugu, kRRiShNa
+      // 'itrans_dravidian'— same but treats short e/o correctly for Dravidian
+      const scheme = document.getElementById('translitScheme')?.value || 'itrans_dravidian';
+      const teluguText = Sanscript.t(inputText, scheme, 'telugu');
       outputDiv.textContent = teluguText;
     } catch (error) {
       console.error('Transliteration error:', error);
       outputDiv.textContent = 'మార్పిడి విఫలమైంది';
     }
   } else {
-    outputDiv.textContent = 'లోడ్ అవుతోంది…';
+    outputDiv.textContent = 'లైబ్రరీ లోడ్ అవుతోంది...';
   }
 }
 
-// Insert transliterated Telugu text into the main editor at cursor position
+// Insert the transliterated Telugu text into the editor at cursor position
 function insertTranslitText() {
   const outputDiv = document.getElementById('translitOutput');
   const teluguText = outputDiv.textContent.trim();
 
-  const invalid = ['', 'లోడ్ అవుతోంది…', 'మార్పిడి విఫలమైంది', 'లోడ్ విఫలమైంది — రిఫ్రెష్ చేయండి'];
+  const invalid = ['', 'మార్పిడి విఫలమైంది', 'లైబ్రరీ లోడ్ అవుతోంది...'];
   if (!teluguText || invalid.includes(teluguText)) {
     showNotification('ముందుగా English టెక్స్ట్ టైప్ చేయండి');
     return;
@@ -843,10 +835,8 @@ function insertTranslitText() {
   const editor = document.getElementById('text-editor');
   editor.focus();
 
-  // execCommand works reliably for contenteditable
   const inserted = document.execCommand('insertText', false, teluguText + ' ');
   if (!inserted) {
-    // Fallback via Selection API
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) {
       const range = sel.getRangeAt(0);

@@ -193,9 +193,11 @@
             <div class="form-group" style="margin-bottom:6px;">
               <label class="form-label" style="font-size:11px;margin-bottom:4px;">Input Scheme</label>
               <select class="form-input" id="translitScheme" style="font-size:12px;padding:4px 6px;">
-                <option value="ITRANS">ITRANS — rAma, namasthe (default)</option>
-                <option value="HK">Harvard-Kyoto (HK) — rAma, namaste</option>
-                <option value="SLP1">SLP1 — rAma, kfzRa</option>
+                <option value="itrans_dravidian">ITRANS Dravidian — raama, ee, oo (recommended)</option>
+                <option value="itrans">ITRANS — rAma, namaste</option>
+                <option value="hk">Harvard-Kyoto — rAma, namaste</option>
+                <option value="slp1">SLP1 — rAma, kfzRa</option>
+                <option value="iast">IAST — rāma, namaste</option>
               </select>
             </div>
             <div class="form-group">
@@ -206,15 +208,16 @@
               <label class="form-label" style="font-size:11px;margin-bottom:4px;">Telugu Output</label>
               <div id="translitOutput" style="background:var(--bg-editor);padding:10px;border-radius:4px;min-height:40px;font-family:'Nirmala UI','Gautami','Noto Serif Telugu',serif;font-size:20px;color:#333;letter-spacing:1px;"></div>
             </div>
-            <!-- Quick reference -->
             <details style="margin-top:8px;font-size:11px;color:var(--text-muted);">
-              <summary style="cursor:pointer;">HK Quick Reference</summary>
+              <summary style="cursor:pointer;">ITRANS Quick Reference</summary>
               <div style="margin-top:6px;line-height:1.8;">
-                <b>Vowels:</b> a A i I u U e E o O ai au<br>
-                <b>Long:</b> uppercase (A=ఆ, I=ఈ, U=ఊ)<br>
-                <b>Retroflex:</b> T Th D Dh N<br>
-                <b>Sibilants:</b> z S s h<br>
-                <b>Visarga:</b> H &nbsp; <b>Anusvara:</b> M
+                <b>Short vowels:</b> a i u e o<br>
+                <b>Long vowels:</b> aa/A ii/I uu/U ee oo<br>
+                <b>Examples:</b> raama→రామ, siita→సీత<br>
+                <b>Retroflex:</b> Ta Tha Da Dha Na<br>
+                <b>Sibilants:</b> sha Sha sa ha<br>
+                <b>Anusvara:</b> M &nbsp; <b>Visarga:</b> H<br>
+                <b>Try:</b> namaste · telugu · krishna
               </div>
             </details>
             <button class="setting-btn" onclick="insertTranslitText()" style="width:100%;margin-top:8px;font-size:12px;">✓ ఎడిటర్‌లో చేర్చు</button>
@@ -412,8 +415,8 @@
 <!-- Notification -->
 <div id="notification"></div>
 
-<!-- Aksharamukha: pinned stable version, loaded before script.js -->
-<script src="https://cdn.jsdelivr.net/npm/aksharamukha@2.0.0/dist/index.global.js"></script>
+<!-- Sanscript.js: synchronous, lightweight, no async init needed -->
+<script src="https://cdn.jsdelivr.net/npm/sanscriptjs@0.0.1/sanscript.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
