@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="te" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>తెలుగు రచన సంపాదకుడు - Telugu Writing Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@300;400;500;600;700;900&family=Noto+Sans+Telugu:wght@300;400;500;600;700;900&family=Tiro+Telugu&family=Mandali&family=Ramabhadra&family=Gurajada&family=Tenali+Ramakrishna&family=Peddana&family=Ramaraja&family=Gidugu&family=Lakki+Reddy&family=NTR&family=Sree+Krushnadevaraya&family=Suranna&family=Suravaram&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- APP SHELL -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="app">
+  
+  <!-- TITLE BAR -->
+  <div id="titlebar">
+    <div>
+      <div class="title-logo">తెలుగు రచన సంపాదకుడు</div>
+      <div class="title-sub">TELUGU WRITING STUDIO</div>
+    </div>
+    <div class="title-actions">
+      <button class="title-btn" onclick="openModal('book-info-modal')">📖 పుస్తక సమాచారం</button>
+      <button class="title-btn" onclick="openModal('preview-modal')">👁 ప్రివ్యూ</button>
+      <button class="title-btn" onclick="openModal('cover-modal')">🎨 కవర్</button>
+      <button class="title-btn" onclick="showStats()">📊 సంఖ్యాశాస్త్రం</button>
+      <button class="title-btn primary" onclick="saveAll()">💾 సేవ్ చేయి</button>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div id="toolbar">
+    <!-- Font Family -->
+    <select class="tb-select" id="font-select" onchange="changeFont(this.value)">
+      <option value="'Noto Serif Telugu',serif">Noto Serif Telugu</option>
+      <option value="'Noto Sans Telugu',sans-serif">Noto Sans Telugu</option>
+      <option value="'Tiro Telugu',serif">Tiro Telugu</option>
+      <option value="'Mandali',sans-serif">Mandali</option>
+      <option value="'Ramabhadra',sans-serif">Ramabhadra</option>
+      <option value="'Gurajada',serif">Gurajada</option>
+      <option value="'Tenali Ramakrishna',sans-serif">Tenali Ramakrishna</option>
+      <option value="'Peddana',serif">Peddana</option>
+      <option value="'Ramaraja',serif">Ramaraja</option>
+      <option value="'Gidugu',sans-serif">Gidugu</option>
+      <option value="'Lakki Reddy',sans-serif">Lakki Reddy</option>
+      <option value="'NTR',sans-serif">NTR</option>
+      <option value="'Sree Krushnadevaraya',serif">Sree Krushnadevaraya</option>
+      <option value="'Suranna',serif">Suranna</option>
+      <option value="'Suravaram',serif">Suravaram</option>
+    </select>
+
+    <!-- Font Size -->
+    <input type="number" class="font-size-input" id="font-size-input" value="18" min="10" max="72" onchange="changeFontSize(this.value)">
+
+    <div class="tb-sep"></div>
+
+    <!-- Text Formatting -->
+    <button class="tb-btn" onclick="execCmd('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+    <button class="tb-btn" onclick="execCmd('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+    <button class="tb-btn" onclick="execCmd('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+
+    <div class="tb-sep"></div>
+
+    <!-- Alignment -->
+    <button class="tb-btn" onclick="execCmd('justifyLeft')" title="Align Left">◧</button>
+    <button class="tb-btn" onclick="execCmd('justifyCenter')" title="Align Center">◨</button>
+    <button class="tb-btn" onclick="execCmd('justifyRight')" title="Align Right">◩</button>
+    <button class="tb-btn" onclick="execCmd('justifyFull')" title="Justify">▭</button>
+
+    <div class="tb-sep"></div>
+
+    <!-- Lists -->
+    <button class="tb-btn" onclick="execCmd('insertUnorderedList')" title="Bullet List">• List</button>
+    <button class="tb-btn" onclick="execCmd('insertOrderedList')" title="Numbered List">1. List</button>
+
+    <div class="tb-sep"></div>
+
+    <!-- Other -->
+    <button class="tb-btn" onclick="insertHeading()" title="Insert Heading">H</button>
+    <button class="tb-btn" onclick="execCmd('removeFormat')" title="Clear Formatting">✕</button>
+  </div>
+
+  <!-- MAIN CONTENT AREA -->
+  <div id="main">
+    
+    <!-- LEFT SIDEBAR -->
+    <div id="sidebar-left">
+      <div class="sidebar-tabs">
+        <div class="s-tab active" onclick="switchSTab('chapters', this)">అధ్యాయాలు</div>
+        <div class="s-tab" onclick="switchSTab('meta', this)">మెటాడేటా</div>
+      </div>
+
+      <!-- Chapters Panel -->
+      <div id="panel-chapters" class="sidebar-panel active">
+        <div class="chapter-actions">
+          <button class="ch-btn" onclick="addChapter()">+ కొత్త</button>
+          <button class="ch-btn" onclick="duplicateChapter()">⎘ నకలు</button>
+        </div>
+        <div id="chapter-list"></div>
+      </div>
+
+      <!-- Meta Panel -->
+      <div id="panel-meta" class="sidebar-panel">
+        <div class="meta-group">
+          <label class="meta-label">పుస్తక పేరు</label>
+          <input type="text" class="meta-input" id="book-title" placeholder="మీ పుస్తక పేరు...">
+        </div>
+        <div class="meta-group">
+          <label class="meta-label">రచయిత</label>
+          <input type="text" class="meta-input" id="book-author" placeholder="రచయిత పేరు...">
+        </div>
+        <div class="meta-group">
+          <label class="meta-label">ప్రకారం</label>
+          <select class="meta-input" id="book-genre">
+            <option value="">ఎంచుకోండి...</option>
+            <option value="కథ">కథ</option>
+            <option value="నవల">నవల</option>
+            <option value="కవిత">కవిత</option>
+            <option value="నాటకం">నాటకం</option>
+            <option value="జీవిత చరిత్ర">జీవిత చరిత్ర</option>
+            <option value="ప్రవచనం">ప్రవచనం</option>
+          </select>
+        </div>
+        <div class="meta-group">
+          <label class="meta-label">ప్రచురణకర్త</label>
+          <input type="text" class="meta-input" id="book-publisher" placeholder="ప్రచురణకర్త...">
+        </div>
+        <div class="meta-group">
+          <label class="meta-label">ISBN</label>
+          <input type="text" class="meta-input" id="book-isbn" placeholder="ISBN...">
+        </div>
+        <div class="meta-group">
+          <label class="meta-label">సంవత్సరం</label>
+          <input type="text" class="meta-input" id="book-year" placeholder="సంవత్సరం...">
+        </div>
+        <button class="ch-btn" onclick="saveBookInfo()" style="margin-top:12px;">సేవ్ చేయి</button>
+      </div>
+    </div>
+
+    <!-- EDITOR -->
+    <div id="editor-wrapper">
+      <div class="editor-header">
+        <input type="text" id="chapter-title-input" placeholder="అధ్యాయం శీర్షిక..." value="అధ్యాయం 1">
+        <div class="lang-selector">
+          <span class="lang-opt active" onclick="setLang('te', this)">తె</span>
+          <span class="lang-opt" onclick="setLang('mix', this)">Te+En</span>
+          <span class="lang-opt" onclick="setLang('en', this)">En</span>
+        </div>
+      </div>
+      <div id="text-editor" contenteditable="true" spellcheck="false"></div>
+      <div id="editor-stats"></div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div id="sidebar-right">
+      <div class="sidebar-tabs">
+        <div class="r-tab active" onclick="switchRTab('dictionary', this)">నిఘంటువు</div>
+        <div class="r-tab" onclick="switchRTab('synonyms', this)">పర్యాయపదాలు</div>
+      </div>
+
+      <!-- Dictionary Panel -->
+      <div id="panel-dictionary" class="right-panel active">
+        <input type="text" class="dict-search" id="dict-search" placeholder="పదం వెతకండి...">
+        <div id="dict-results"></div>
+      </div>
+
+      <!-- Synonyms Panel -->
+      <div id="panel-synonyms" class="right-panel">
+        <input type="text" class="dict-search" id="syn-search" placeholder="పర్యాయపదాలు వెతకండి...">
+        <div id="syn-results"></div>
+      </div>
+    </div>
+
+    <!-- Sidebar Toggles -->
+    <div id="left-toggle" class="sidebar-toggle left" onclick="toggleSidebar('left')">◀</div>
+    <div id="right-toggle" class="sidebar-toggle right" onclick="toggleSidebar('right')">▶</div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div id="statusbar">
+    <div id="total-stats"></div>
+    <div style="flex:1"></div>
+    <div style="font-size:9px;color:var(--text-muted);">© తెలుగు రచన సంపాదకుడు 2025</div>
+  </div>
+</div>
+
+<!-- MODALS -->
+
+<!-- Book Info Modal -->
+<div id="book-info-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📖 పుస్తక సమాచారం</h3>
+      <button class="modal-close" onclick="closeModal('book-info-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="meta-group">
+        <label class="meta-label">పుస్తక పేరు</label>
+        <input type="text" class="meta-input" id="modal-title">
+      </div>
+      <div class="meta-group">
+        <label class="meta-label">రచయిత</label>
+        <input type="text" class="meta-input" id="modal-author">
+      </div>
+      <div class="meta-group">
+        <label class="meta-label">ప్రకారం</label>
+        <select class="meta-input" id="modal-genre">
+          <option value="">ఎంచుకోండి...</option>
+          <option value="కథ">కథ</option>
+          <option value="నవల">నవల</option>
+          <option value="కవిత">కవిత</option>
+          <option value="నాటకం">నాటకం</option>
+          <option value="జీవిత చరిత్ర">జీవిత చరిత్ర</option>
+          <option value="ప్రవచనం">ప్రవచనం</option>
+        </select>
+      </div>
+      <div class="meta-group">
+        <label class="meta-label">ప్రచురణకర్త</label>
+        <input type="text" class="meta-input" id="modal-publisher">
+      </div>
+      <div class="meta-group">
+        <label class="meta-label">ISBN</label>
+        <input type="text" class="meta-input" id="modal-isbn">
+      </div>
+      <div class="meta-group">
+        <label class="meta-label">సంవత్సరం</label>
+        <input type="text" class="meta-input" id="modal-year">
+      </div>
+      <button class="modal-btn" onclick="saveBookInfoFromModal()">సేవ్ చేయి</button>
+    </div>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div id="preview-modal" class="modal-overlay">
+  <div class="modal modal-large">
+    <div class="modal-header">
+      <h3>👁 ప్రివ్యూ</h3>
+      <div style="display:flex;gap:8px;">
+        <select class="tb-select" onchange="renderPreview(this.value); currentLayout=this.value;">
+          <option value="classic">క్లాసిక్ లేఅవుట్</option>
+          <option value="modern">మోడరన్ లేఅవుట్</option>
+          <option value="dark">డార్క్ లేఅవుట్</option>
+        </select>
+        <button class="modal-close" onclick="closeModal('preview-modal')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" style="padding:0;overflow-y:auto;">
+      <div id="preview-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Cover Designer Modal -->
+<div id="cover-modal" class="modal-overlay">
+  <div class="modal modal-large">
+    <div class="modal-header">
+      <h3>🎨 కవర్ రూపకల్పన</h3>
+      <button class="modal-close" onclick="closeModal('cover-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <!-- Canvas -->
+        <div>
+          <canvas id="cover-canvas" width="600" height="900" style="width:100%;border:2px solid var(--border);border-radius:8px;"></canvas>
+          <button class="modal-btn" onclick="downloadCover()" style="width:100%;margin-top:12px;">⬇ కవర్ డౌన్‌లోడ్ చేయండి</button>
+        </div>
+        <!-- Controls -->
+        <div style="overflow-y:auto;max-height:600px;">
+          <div class="cover-group">
+            <label class="cover-label">టెంప్లేట్ ఎంచుకోండి</label>
+            <div id="cover-templates" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
+          </div>
+          <div class="cover-group">
+            <label class="cover-label">పుస్తక పేరు</label>
+            <input type="text" class="cover-input" id="cover-title" onkeyup="generateCover()">
+          </div>
+          <div class="cover-group">
+            <label class="cover-label">రచయిత</label>
+            <input type="text" class="cover-input" id="cover-author" onkeyup="generateCover()">
+          </div>
+          <div class="cover-group">
+            <label class="cover-label">ఉప శీర్షిక</label>
+            <input type="text" class="cover-input" id="cover-subtitle" onkeyup="generateCover()">
+          </div>
+          <div class="cover-group">
+            <label class="cover-label">ప్రధాన రంగు</label>
+            <input type="color" class="cover-input" id="cover-color" value="#c9933a" onchange="generateCover()">
+          </div>
+          <div class="cover-group">
+            <label class="cover-label">నేపథ్య రంగు</label>
+            <input type="color" class="cover-input" id="cover-bg" value="#1a0f05" onchange="generateCover()">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Modal -->
+<div id="stats-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📊 పుస్తక సంఖ్యాశాస్త్రం</h3>
+      <button class="modal-close" onclick="closeModal('stats-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="stats-content" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Export Menu -->
+<div id="export-menu" class="context-menu">
+  <div class="context-item" onclick="exportAs('txt'); closeContextMenu();">📄 TXT ఫైల్‌గా ఎగుమతి చేయండి</div>
+  <div class="context-item" onclick="exportAs('html'); closeContextMenu();">🌐 HTML ఫైల్‌గా ఎగుమతి చేయండి</div>
+  <div class="context-item" onclick="exportAs('pdf'); closeContextMenu();">📕 PDF గా ముద్రించండి</div>
+</div>
+
+<!-- Notification -->
+<div id="notification"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

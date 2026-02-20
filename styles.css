@@ -1,0 +1,718 @@
+:root {
+  --bg-deep: #0e0b08;
+  --bg-panel: #16120d;
+  --bg-card: #1e1812;
+  --bg-editor: #faf6ee;
+  --gold: #c9933a;
+  --gold-light: #e8b95c;
+  --gold-pale: #f5dfa0;
+  --amber: #d4791a;
+  --rust: #8b3a1e;
+  --cream: #fdf6e3;
+  --text-light: #e8d9bc;
+  --text-muted: #8a7560;
+  --border: #2e2318;
+  --border-gold: #4a3a1e;
+  --accent: #c9933a;
+  --sidebar-w: 280px;
+  --toolbar-h: 56px;
+  --status-h: 28px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: var(--text-light); font-family: 'Noto Sans Telugu', sans-serif; }
+
+/* ═══ APP SHELL ═══ */
+#app { display: grid; grid-template-rows: auto auto 1fr auto; height: 100vh; }
+#titlebar {
+  background: linear-gradient(135deg, #0a0703 0%, #1a1008 40%, #0d0b06 100%);
+  border-bottom: 1px solid var(--gold);
+  padding: 0 16px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+#titlebar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+}
+.title-logo {
+  font-family: 'Noto Serif Telugu', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, var(--gold-pale), var(--gold), var(--amber));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.title-sub { font-size: 10px; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 1px; }
+.title-actions { display: flex; gap: 8px; align-items: center; }
+.title-btn {
+  background: rgba(201,147,58,0.12);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: 'Noto Sans Telugu', sans-serif;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.title-btn:hover { background: rgba(201,147,58,0.25); border-color: var(--gold); }
+.title-btn.primary { background: linear-gradient(135deg, var(--amber), var(--gold)); color: #1a0f05; border-color: var(--gold-light); font-weight: 600; }
+.title-btn.primary:hover { background: linear-gradient(135deg, var(--gold), var(--gold-light)); }
+
+/* ═══ TOOLBAR ═══ */
+#toolbar {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  height: var(--toolbar-h);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 4px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+.tb-sep { width: 1px; height: 28px; background: var(--border); margin: 0 6px; flex-shrink: 0; }
+.tb-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+.tb-btn:hover { background: rgba(201,147,58,0.1); border-color: var(--border-gold); color: var(--gold-light); }
+.tb-btn.active { background: rgba(201,147,58,0.2); border-color: var(--gold); color: var(--gold-light); }
+.tb-select {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+  flex-shrink: 0;
+  font-family: 'Noto Sans Telugu', sans-serif;
+  max-width: 180px;
+}
+.tb-select:hover { border-color: var(--border-gold); }
+.font-size-input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  width: 50px;
+  text-align: center;
+  outline: none;
+}
+
+/* ═══ MAIN LAYOUT ═══ */
+#main { display: flex; overflow: hidden; position: relative; }
+
+/* ═══ LEFT SIDEBAR ═══ */
+#sidebar-left {
+  width: var(--sidebar-w);
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 0.25s;
+}
+#sidebar-left.collapsed { width: 0; }
+.sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.s-tab {
+  flex: 1;
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.s-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+.sidebar-panel { display: none; flex-direction: column; overflow: hidden; height: 100%; padding: 12px; }
+.sidebar-panel.active { display: flex; }
+
+/* Chapters */
+.chapter-actions { display: flex; gap: 6px; margin-bottom: 10px; }
+.ch-btn {
+  flex: 1;
+  background: rgba(201,147,58,0.1);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 6px 4px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+.ch-btn:hover { background: rgba(201,147,58,0.25); }
+#chapter-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.chapter-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.chapter-item:hover { border-color: var(--border-gold); }
+.chapter-item.active { border-color: var(--gold); background: rgba(201,147,58,0.08); }
+.chapter-title { font-size: 13px; color: var(--text-light); margin-bottom: 4px; font-weight: 500; }
+.chapter-meta { font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 10px; }
+.chapter-delete {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: rgba(139,58,30,0.3);
+  border: 1px solid var(--rust);
+  color: var(--rust);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.chapter-item:hover .chapter-delete { opacity: 1; }
+.chapter-delete:hover { background: var(--rust); color: white; }
+
+/* ═══ EDITOR ═══ */
+#editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+#text-editor {
+  flex: 1;
+  padding: 32px 48px;
+  overflow-y: auto;
+  background: var(--bg-editor);
+  color: #2a1e0f;
+  font-family: 'Noto Serif Telugu', serif;
+  font-size: 16px;
+  line-height: 1.8;
+  outline: none;
+  direction: ltr;
+}
+#editor-status {
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+  height: var(--status-h);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.status-item { display: flex; align-items: center; gap: 12px; }
+
+/* ═══ RIGHT SIDEBAR ═══ */
+#sidebar-right {
+  width: var(--sidebar-w);
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 0.25s;
+}
+#sidebar-right.collapsed { width: 0; }
+.right-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.r-tab {
+  flex: 1;
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.r-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+.right-panel { display: none; flex-direction: column; overflow: hidden; height: 100%; padding: 12px; }
+.right-panel.active { display: flex; }
+
+/* ═══ DICTIONARY PANEL ═══ */
+.dict-search-box {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.dict-input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 15px;
+  font-family: 'Noto Sans Telugu', sans-serif;
+  outline: none;
+}
+
+.dict-input:focus {
+  border-color: var(--gold);
+}
+
+.dict-search-btn {
+  background: rgba(201,147,58,0.2);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.dict-search-btn:hover {
+  background: rgba(201,147,58,0.35);
+  border-color: var(--gold);
+}
+
+.dict-results {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+}
+
+.dict-entry {
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dict-entry:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.dict-word {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold-light);
+  font-family: 'Noto Serif Telugu', serif;
+  margin-bottom: 10px;
+}
+
+.dict-pos {
+  font-size: 11px;
+  color: var(--amber);
+  font-style: italic;
+  margin-bottom: 8px;
+  display: inline-block;
+  background: rgba(201,147,58,0.15);
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+.dict-meaning {
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.7;
+  margin-bottom: 10px;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+
+.dict-example {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-left: 12px;
+  margin-top: 6px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border-gold);
+}
+
+.dict-synonyms {
+  font-size: 12px;
+  color: var(--gold-pale);
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(201,147,58,0.08);
+  border-radius: 4px;
+  border-left: 2px solid var(--gold);
+}
+
+.dict-loading {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.dict-error {
+  text-align: center;
+  padding: 20px;
+  color: var(--rust);
+  font-size: 13px;
+}
+
+.dict-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.dict-quick-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.dict-quick-word {
+  background: rgba(201,147,58,0.12);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dict-quick-word:hover {
+  background: rgba(201,147,58,0.25);
+  border-color: var(--gold);
+}
+
+/* Templates */
+.template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex: 1; overflow-y: auto; }
+.template-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.template-card:hover { border-color: var(--border-gold); }
+.template-card.active { border-color: var(--gold); background: rgba(201,147,58,0.08); }
+.template-icon { font-size: 28px; margin-bottom: 6px; }
+.template-name { font-size: 11px; color: var(--text-light); }
+
+/* Reference */
+.ref-section { margin-bottom: 16px; }
+.ref-title { font-size: 12px; color: var(--gold-light); font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.ref-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 8px; margin-bottom: 6px; cursor: pointer; font-size: 13px; color: var(--text-light); transition: all 0.2s; }
+.ref-item:hover { border-color: var(--border-gold); background: rgba(201,147,58,0.08); }
+.ref-panel-content { flex: 1; overflow-y: auto; }
+
+/* Settings */
+.setting-group { margin-bottom: 16px; }
+.setting-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; display: block; }
+.setting-select, .setting-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  outline: none;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+.setting-btn {
+  width: 100%;
+  background: rgba(201,147,58,0.2);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.setting-btn:hover { background: rgba(201,147,58,0.35); }
+.lang-opts { display: flex; gap: 6px; margin-top: 6px; }
+.lang-opt {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 6px 4px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.lang-opt:hover { border-color: var(--border-gold); }
+.lang-opt.active { border-color: var(--gold); background: rgba(201,147,58,0.2); color: var(--gold-light); }
+
+/* ═══ SIDEBAR TOGGLES ═══ */
+.sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 8px 6px;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.sidebar-toggle:hover { background: var(--bg-card); color: var(--gold-light); border-color: var(--border-gold); }
+#left-toggle { left: var(--sidebar-w); }
+#left-toggle.collapsed { left: 0; }
+#right-toggle { right: var(--sidebar-w); }
+#right-toggle.collapsed { right: 0; }
+
+/* ═══ MODALS ═══ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-gold);
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 85vh;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(201,147,58,0.25);
+}
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title { font-size: 16px; color: var(--gold-light); font-weight: 600; font-family: 'Noto Serif Telugu', serif; }
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.modal-close:hover { color: var(--gold-light); }
+.modal-body { padding: 20px; overflow-y: auto; max-height: calc(85vh - 120px); }
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+.form-input, .form-textarea {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+.form-textarea { min-height: 80px; resize: vertical; }
+.form-input:focus, .form-textarea:focus { border-color: var(--gold); }
+.modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.btn {
+  background: rgba(201,147,58,0.15);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn:hover { background: rgba(201,147,58,0.3); }
+.btn.primary { background: linear-gradient(135deg, var(--amber), var(--gold)); color: #1a0f05; border-color: var(--gold-light); font-weight: 600; }
+.btn.primary:hover { background: linear-gradient(135deg, var(--gold), var(--gold-light)); }
+
+/* Wide modal for export preview */
+.modal-wide { max-width: 900px; }
+#preview-content { padding: 20px; background: white; color: #2a1e0f; font-family: 'Noto Serif Telugu', serif; line-height: 1.8; max-height: 60vh; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; }
+#layout-buttons { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.layout-btn { flex: 1; min-width: 100px; padding: 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; text-align: center; font-size: 11px; color: var(--text-light); transition: all 0.2s; }
+.layout-btn:hover { border-color: var(--border-gold); }
+.layout-btn.active { border-color: var(--gold); background: rgba(201,147,58,0.15); color: var(--gold-light); }
+
+/* Stats Modal */
+#stats-content { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+/* Cover Modal */
+#cover-modal .modal { max-width: 850px; }
+.cover-designer { display: grid; grid-template-columns: 420px 1fr; gap: 20px; }
+#cover-preview { 
+  width: 400px; 
+  height: 600px; 
+  border: 2px solid var(--border-gold); 
+  border-radius: 8px; 
+  overflow: hidden; 
+  position: relative;
+  background: #000;
+}
+#cover-canvas { width: 100%; height: 100%; }
+.cover-controls { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; max-height: 600px; }
+.cover-section-title { 
+  font-size: 13px; 
+  color: var(--gold-light); 
+  font-weight: 600; 
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.cover-images-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 8px;
+  padding: 4px;
+}
+.cover-image-item {
+  aspect-ratio: 2/3;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.2s;
+  position: relative;
+}
+.cover-image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cover-image-item:hover {
+  border-color: var(--border-gold);
+  transform: scale(1.05);
+}
+.cover-image-item.active {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(201,147,58,0.5);
+}
+.cover-image-loading {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.cover-templates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+.cover-template {
+  aspect-ratio: 2/3;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+  position: relative;
+}
+.cover-template:hover { border-color: var(--border-gold); }
+.cover-template.active { border-color: var(--gold); box-shadow: 0 0 12px rgba(201,147,58,0.4); }
+
+/* Notification */
+#notification {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: linear-gradient(135deg, var(--amber), var(--gold));
+  color: #1a0f05;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(201,147,58,0.4);
+  z-index: 2000;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+#notification.show { opacity: 1; transform: translateY(0); }
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-card); }
+::-webkit-scrollbar-thumb { background: var(--border-gold); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+</style>
+    let content = `<!DOCTYPE html><html lang="te"><head><meta charset="UTF-8"><title>${title}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@400;700&display=swap" rel="stylesheet"><style>${css}</style></head><body>`;
+    content += `<h1>${title}</h1><p style="text-align:center;">${author} రచించిన</p><hr>`;
+    chapters.forEach((ch, i) => {
+      const txt = i === currentChapterIdx ? document.getElementById('text-editor').innerHTML : (ch.content || '');
+      content += `<h2>అధ్యాయం ${i+1}: ${ch.title}</h2>${txt}<hr>`;
+    });
+    content += `</body></html>`;
+    downloadFile(content, `${title}.html`, 'text/html;charset=utf-8');
+    showNotification('HTML ఫైల్ సేవ్ అయింది!');
+  }
+  else if (type === 'pdf' || type === 'print') {
+    const css2 = `
+      @page{size:A4;margin:25mm 30mm;}
+      body{font-family:'Noto Serif Telugu',serif;font-size:14pt;line-height:2;color:#2a1e0f;}
+      h1{text-align:center;font-size:22pt;color:#8b4513;page-break-after:avoid;}
+      h2{font-size:16pt;color:#8b4513;page-break-before:always;page-break-after:avoid;}
+      .cover{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+      .cover h1{font-size:32pt;color:#c9933a;margin-bottom:20px;}
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@400;700&display=swap');
+    `;
+    let body = `<div class="cover"><h1>${title}</h1><p style="font-size:16pt;">${author}</p><p style="font-size:12pt;">${bookData.publisher||''}</p></div>`;
+    chapters.forEach((ch, i) => {
+      const txt = i === currentChapterIdx ? document.getElementById('text-editor').innerHTML : (ch.content || '');
+      body += `<h2>అధ్యాయం ${i+1}: ${ch.title}</h2>${txt}`;
+    });
+    const win = window.open('');
