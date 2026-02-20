@@ -691,6 +691,56 @@ function updateStats() {
   updateTotalStats();
 }
 
+// ═══════════════════════════════════════════════════════
+// MISSING HELPERS
+// ═══════════════════════════════════════════════════════
+function insertHeading() {
+  const editor = document.getElementById('text-editor');
+  editor.focus();
+  document.execCommand('formatBlock', false, 'h2');
+}
+
+// saveBookInfo — called from the left-sidebar meta panel button
+function saveBookInfo() {
+  bookData.title     = document.getElementById('book-title').value;
+  bookData.author    = document.getElementById('book-author').value;
+  bookData.genre     = document.getElementById('book-genre').value;
+  bookData.publisher = document.getElementById('book-publisher').value;
+  const isbnEl = document.getElementById('book-isbn');
+  const yearEl = document.getElementById('book-year');
+  if (isbnEl) bookData.isbn = isbnEl.value;
+  if (yearEl) bookData.year = yearEl.value;
+  showNotification('పుస్తక వివరాలు సేవ్ చేయబడ్డాయి!');
+  saveAll();
+}
+
+// saveBookInfoFromModal — called from the book-info-modal button
+function saveBookInfoFromModal() {
+  bookData.title     = document.getElementById('modal-title').value;
+  bookData.author    = document.getElementById('modal-author').value;
+  bookData.genre     = document.getElementById('modal-genre').value;
+  bookData.publisher = document.getElementById('modal-publisher').value;
+  const isbnEl = document.getElementById('modal-isbn');
+  const yearEl = document.getElementById('modal-year');
+  if (isbnEl) bookData.isbn = isbnEl.value;
+  if (yearEl) bookData.year = yearEl.value;
+  // Sync back to sidebar fields if they exist
+  ['title','author','genre','publisher'].forEach(k => {
+    const el = document.getElementById('book-' + k);
+    if (el) el.value = bookData[k] || '';
+  });
+  closeModal('book-info-modal');
+  showNotification('పుస్తక సమాచారం సేవ్ చేయబడింది!');
+  saveAll();
+}
+
+// autoSave — lightweight alias used internally
+function autoSave() {
+  saveCurrentChapter();
+  const data = { chapters, bookData, coverData, currentChapterIdx };
+  localStorage.setItem('telugu-book', JSON.stringify(data));
+}
+
 // Initialize
 const editor = document.getElementById('text-editor');
 const style = document.createElement('style');
@@ -725,90 +775,97 @@ window.addEventListener('load', () => {
 // ═══════════════════════════════════════════════════════
 // AKSHARAMUKHA TRANSLITERATION
 // ═══════════════════════════════════════════════════════
-let aksharamukhaReady = false;
+// aksharamukhaInstance is set by the <script type="module"> in index.html
+// which uses top-level await — the only correct way to call Aksharamukha.new().
+// Regular scripts cannot use top-level await, which is why the previous polling
+// loop never worked.
+window.aksharamukhaInstance = null;
+let translitDebounceTimer = null;
 
-// Initialize Aksharamukha
-function initializeTransliteration() {
-  try {
-    // Check if Aksharamukha library is loaded
-    if (typeof Aksharamukha !== 'undefined') {
-      aksharamukhaReady = true;
-      console.log('Aksharamukha library loaded successfully');
-      
-      // Add event listener to input field
-      const translitInput = document.getElementById('translitInput');
-      if (translitInput) {
-        translitInput.addEventListener('input', handleTransliteration);
-        console.log('Transliteration input listener added');
-      }
-    } else {
-      console.warn('Aksharamukha library not loaded yet, retrying...');
-      setTimeout(initializeTransliteration, 500);
-    }
-  } catch (error) {
-    console.error('Error initializing Aksharamukha:', error);
-    showNotification('ట్రాన్స్‌లిటరేషన్ లోడ్ చేయడంలో సమస్య');
+// Called by the module script in index.html once the instance is ready
+function onAksharamukhaReady(instance) {
+  window.aksharamukhaInstance = instance;
+  const outputDiv = document.getElementById('translitOutput');
+  if (outputDiv) {
+    outputDiv.textContent = '';
+    outputDiv.dataset.ready = 'true';
+  }
+  console.log('Aksharamukha ready ✓');
+
+  const translitInput = document.getElementById('translitInput');
+  if (translitInput) {
+    translitInput.disabled = false;
+    translitInput.placeholder = 'e.g.  rAma, namasthe, kRRiShNa';
+    translitInput.addEventListener('input', () => {
+      clearTimeout(translitDebounceTimer);
+      translitDebounceTimer = setTimeout(() => handleTransliteration(translitInput.value), 150);
+    });
   }
 }
 
-// Handle transliteration as user types
-function handleTransliteration(event) {
-  const inputText = event.target.value;
+// Perform transliteration — called on each debounced input event
+async function handleTransliteration(inputText) {
   const outputDiv = document.getElementById('translitOutput');
-  
   if (!inputText.trim()) {
     outputDiv.textContent = '';
+    outputDiv.style.color = '';
     return;
   }
-  
-  if (aksharamukhaReady && typeof Aksharamukha !== 'undefined') {
-    try {
-      // Convert ITRANS to Telugu using Aksharamukha API
-      const teluguText = Aksharamukha.convert(inputText, 'ITRANS', 'Telugu');
-      outputDiv.textContent = teluguText;
-    } catch (error) {
-      console.error('Transliteration error:', error);
-      outputDiv.textContent = 'మార్పిడి విఫలమైంది';
-    }
-  } else {
-    outputDiv.textContent = 'లైబ్రరీ లోడ్ అవుతోంది...';
+  if (!window.aksharamukhaInstance) {
+    outputDiv.textContent = 'లోడ్ అవుతోంది…';
+    return;
+  }
+  try {
+    const source = document.getElementById('translitScheme')?.value || 'ITRANS';
+    const result = await window.aksharamukhaInstance.process(source, 'Telugu', inputText);
+    outputDiv.textContent = result;
+    outputDiv.style.color = '';
+  } catch (err) {
+    console.error('Transliteration error:', err);
+    outputDiv.textContent = 'మార్పిడి విఫలమైంది';
+    outputDiv.style.color = '#c0392b';
   }
 }
 
-// Insert transliterated text into editor
+// Insert the transliterated Telugu text into the main editor
 function insertTranslitText() {
   const outputDiv = document.getElementById('translitOutput');
-  const teluguText = outputDiv.textContent;
-  
-  if (!teluguText || teluguText === 'లైబ్రరీ లోడ్ అవుతోంది...' || teluguText === 'మార్పిడి విఫలమైంది') {
-    showNotification('ముందుగా టెక్స్ట్ టైప్ చేయండి');
+  const teluguText = outputDiv.textContent.trim();
+
+  const invalid = ['', 'లోడ్ అవుతోంది…', 'మార్పిడి విఫలమైంది', 'లోడ్ అవుతోంది...'];
+  if (!teluguText || invalid.includes(teluguText)) {
+    showNotification('ముందుగా English టెక్స్ట్ టైప్ చేయండి');
     return;
   }
-  
-  // Insert into editor
+
   const editor = document.getElementById('text-editor');
-  if (editor) {
-    const selection = window.getSelection();
-    const range = selection.getRangeAt(0);
-    const textNode = document.createTextNode(teluguText + ' ');
-    range.insertNode(textNode);
-    
-    // Move cursor after inserted text
-    range.setStartAfter(textNode);
-    range.setEndAfter(textNode);
-    selection.removeAllRanges();
-    selection.addRange(range);
-    
-    // Update stats and save
-    updateStats();
-    autoSave();
-    
-    // Clear input
-    document.getElementById('translitInput').value = '';
-    outputDiv.textContent = '';
-    
-    showNotification('టెక్స్ట్ చేర్చబడింది');
+  editor.focus();
+
+  const inserted = document.execCommand('insertText', false, teluguText + ' ');
+  if (!inserted) {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      const node = document.createTextNode(teluguText + ' ');
+      range.insertNode(node);
+      range.setStartAfter(node);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      editor.innerHTML += teluguText + ' ';
+    }
   }
+
+  updateStats();
+  saveCurrentChapter();
+  document.getElementById('translitInput').value = '';
+  outputDiv.textContent = '';
+  showNotification('తెలుగు టెక్స్ట్ చేర్చబడింది ✓');
 }
+
+// Stub so the load handler doesn't throw — actual init is in the module script
+function initializeTransliteration() {}
 
 

@@ -194,8 +194,8 @@
             <div class="form-group" style="margin-bottom:6px;">
               <label class="form-label" style="font-size:11px;margin-bottom:4px;">Input Scheme</label>
               <select class="form-input" id="translitScheme" style="font-size:12px;padding:4px 6px;">
-                <option value="HK">Harvard-Kyoto (HK) — rAma, kRRiShNa</option>
-                <option value="ITRANS">ITRANS — rAma, kRRiShNa</option>
+                <option value="ITRANS">ITRANS — rAma, namasthe (default)</option>
+                <option value="HK">Harvard-Kyoto (HK) — rAma, namaste</option>
                 <option value="SLP1">SLP1 — rAma, kfzRa</option>
               </select>
             </div>
@@ -414,5 +414,41 @@
 <div id="notification"></div>
 
 <script src="script.js"></script>
+
+<!--
+  Aksharamukha MUST be initialised with top-level await inside a module script.
+  Regular scripts (and async functions called from them) cannot use top-level
+  await, which is why the previous polling loop ran 40 times and gave up.
+  This module block runs after script.js has defined onAksharamukhaReady(),
+  awaits the instance, then hands it over.
+-->
+<script type="module">
+  const outputDiv = document.getElementById('translitOutput');
+  const translitInput = document.getElementById('translitInput');
+
+  // Disable input while loading so the user sees the placeholder
+  if (translitInput) {
+    translitInput.disabled = true;
+    translitInput.placeholder = 'లోడ్ అవుతోంది…';
+  }
+  if (outputDiv) outputDiv.textContent = '';
+
+  try {
+    // Top-level await — works only in module scripts
+    const aksharamukha = await Aksharamukha.new();
+    // Hand the live instance to script.js
+    onAksharamukhaReady(aksharamukha);
+  } catch (err) {
+    console.error('Aksharamukha failed to load:', err);
+    if (outputDiv) {
+      outputDiv.textContent = 'లైబ్రరీ లోడ్ కాలేదు — పేజీని రిఫ్రెష్ చేయండి';
+      outputDiv.style.color = '#c0392b';
+    }
+    if (translitInput) {
+      translitInput.disabled = false;
+      translitInput.placeholder = 'లోడ్ విఫలమైంది';
+    }
+  }
+</script>
 </body>
 </html>
