@@ -725,15 +725,15 @@ window.addEventListener('load', () => {
 // ═══════════════════════════════════════════════════════
 // AKSHARAMUKHA TRANSLITERATION
 // ═══════════════════════════════════════════════════════
-let aksharamukhaInstance = null;
+let aksharamukhaReady = false;
 
-// Initialize Aksharamukha asynchronously
-async function initializeTransliteration() {
+// Initialize Aksharamukha
+function initializeTransliteration() {
   try {
-    // Wait for Aksharamukha library to be available
+    // Check if Aksharamukha library is loaded
     if (typeof Aksharamukha !== 'undefined') {
-      aksharamukhaInstance = await Aksharamukha.new();
-      console.log('Aksharamukha initialized successfully');
+      aksharamukhaReady = true;
+      console.log('Aksharamukha library loaded successfully');
       
       // Add event listener to input field
       const translitInput = document.getElementById('translitInput');
@@ -761,10 +761,10 @@ function handleTransliteration(event) {
     return;
   }
   
-  if (aksharamukhaInstance) {
+  if (aksharamukhaReady && typeof Aksharamukha !== 'undefined') {
     try {
-      // Convert ITRANS to Telugu
-      const teluguText = aksharamukhaInstance.convert(inputText, 'ITRANS', 'Telugu');
+      // Convert ITRANS to Telugu using Aksharamukha API
+      const teluguText = Aksharamukha.convert(inputText, 'ITRANS', 'Telugu');
       outputDiv.textContent = teluguText;
     } catch (error) {
       console.error('Transliteration error:', error);
@@ -810,4 +810,5 @@ function insertTranslitText() {
     showNotification('టెక్స్ట్ చేర్చబడింది');
   }
 }
+
 
