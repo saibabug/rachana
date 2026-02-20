@@ -204,6 +204,13 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: 
 .chapter-delete:hover { background: var(--rust); color: white; }
 
 /* ═══ EDITOR ═══ */
+#editor-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
 #editor-container {
   flex: 1;
   display: flex;
@@ -505,6 +512,21 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: 
 #right-toggle { right: var(--sidebar-w); }
 #right-toggle.collapsed { right: 0; }
 
+/* ═══ STATUS BAR ═══ */
+#statusbar {
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+  height: var(--status-h);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+#total-stats {
+  font-size: 11px;
+}
+
 /* ═══ MODALS ═══ */
 .modal-overlay {
   display: none;
@@ -583,6 +605,20 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: 
 
 /* Wide modal for export preview */
 .modal-wide { max-width: 900px; }
+.modal-large { max-width: 900px; }
+.modal-btn {
+  width: 100%;
+  background: rgba(201,147,58,0.2);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+.modal-btn:hover { background: rgba(201,147,58,0.35); }
 #preview-content { padding: 20px; background: white; color: #2a1e0f; font-family: 'Noto Serif Telugu', serif; line-height: 1.8; max-height: 60vh; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; }
 #layout-buttons { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .layout-btn { flex: 1; min-width: 100px; padding: 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; text-align: center; font-size: 11px; color: var(--text-light); transition: all 0.2s; }
@@ -595,6 +631,25 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: 
 /* Cover Modal */
 #cover-modal .modal { max-width: 850px; }
 .cover-designer { display: grid; grid-template-columns: 420px 1fr; gap: 20px; }
+.cover-group { margin-bottom: 14px; }
+.cover-label { 
+  display: block;
+  font-size: 11px; 
+  color: var(--text-muted); 
+  margin-bottom: 6px;
+}
+.cover-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  outline: none;
+  font-family: 'Noto Sans Telugu', sans-serif;
+}
+.cover-input:focus { border-color: var(--gold); }
 #cover-preview { 
   width: 400px; 
   height: 600px; 

@@ -103,17 +103,17 @@
 
       <!-- Meta Panel -->
       <div id="panel-meta" class="sidebar-panel">
-        <div class="meta-group">
-          <label class="meta-label">పుస్తక పేరు</label>
-          <input type="text" class="meta-input" id="book-title" placeholder="మీ పుస్తక పేరు...">
+        <div class="form-group">
+          <label class="form-label">పుస్తక పేరు</label>
+          <input type="text" class="form-input" id="book-title" placeholder="మీ పుస్తక పేరు...">
         </div>
-        <div class="meta-group">
-          <label class="meta-label">రచయిత</label>
-          <input type="text" class="meta-input" id="book-author" placeholder="రచయిత పేరు...">
+        <div class="form-group">
+          <label class="form-label">రచయిత</label>
+          <input type="text" class="form-input" id="book-author" placeholder="రచయిత పేరు...">
         </div>
-        <div class="meta-group">
-          <label class="meta-label">ప్రకారం</label>
-          <select class="meta-input" id="book-genre">
+        <div class="form-group">
+          <label class="form-label">ప్రకారం</label>
+          <select class="form-input" id="book-genre">
             <option value="">ఎంచుకోండి...</option>
             <option value="కథ">కథ</option>
             <option value="నవల">నవల</option>
@@ -123,17 +123,17 @@
             <option value="ప్రవచనం">ప్రవచనం</option>
           </select>
         </div>
-        <div class="meta-group">
-          <label class="meta-label">ప్రచురణకర్త</label>
-          <input type="text" class="meta-input" id="book-publisher" placeholder="ప్రచురణకర్త...">
+        <div class="form-group">
+          <label class="form-label">ప్రచురణకర్త</label>
+          <input type="text" class="form-input" id="book-publisher" placeholder="ప్రచురణకర్త...">
         </div>
-        <div class="meta-group">
-          <label class="meta-label">ISBN</label>
-          <input type="text" class="meta-input" id="book-isbn" placeholder="ISBN...">
+        <div class="form-group">
+          <label class="form-label">ISBN</label>
+          <input type="text" class="form-input" id="book-isbn" placeholder="ISBN...">
         </div>
-        <div class="meta-group">
-          <label class="meta-label">సంవత్సరం</label>
-          <input type="text" class="meta-input" id="book-year" placeholder="సంవత్సరం...">
+        <div class="form-group">
+          <label class="form-label">సంవత్సరం</label>
+          <input type="text" class="form-input" id="book-year" placeholder="సంవత్సరం...">
         </div>
         <button class="ch-btn" onclick="saveBookInfo()" style="margin-top:12px;">సేవ్ చేయి</button>
       </div>
@@ -141,41 +141,97 @@
 
     <!-- EDITOR -->
     <div id="editor-wrapper">
-      <div class="editor-header">
-        <input type="text" id="chapter-title-input" placeholder="అధ్యాయం శీర్షిక..." value="అధ్యాయం 1">
-        <div class="lang-selector">
-          <span class="lang-opt active" onclick="setLang('te', this)">తె</span>
-          <span class="lang-opt" onclick="setLang('mix', this)">Te+En</span>
-          <span class="lang-opt" onclick="setLang('en', this)">En</span>
+      <div id="text-editor" contenteditable="true" spellcheck="false" oninput="updateStats()" onmouseup="checkSelection()"></div>
+      <div id="editor-status">
+        <div class="status-item">
+          <span id="status-words">పదాలు: 0</span>
+          <span id="status-chars">అక్షరాలు: 0</span>
+          <span id="status-read-time">చదవడం: 0 నిమి.</span>
+        </div>
+        <div class="status-item">
+          <span id="status-chapter">అధ్యాయం 1 / 1</span>
         </div>
       </div>
-      <div id="text-editor" contenteditable="true" spellcheck="false"></div>
-      <div id="editor-stats"></div>
     </div>
 
     <!-- RIGHT SIDEBAR -->
     <div id="sidebar-right">
       <div class="sidebar-tabs">
         <div class="r-tab active" onclick="switchRTab('dictionary', this)">నిఘంటువు</div>
-        <div class="r-tab" onclick="switchRTab('synonyms', this)">పర్యాయపదాలు</div>
+        <div class="r-tab" onclick="switchRTab('reference', this)">సూచనలు</div>
+        <div class="r-tab" onclick="switchRTab('settings', this)">సెట్టింగ్స్</div>
       </div>
 
       <!-- Dictionary Panel -->
       <div id="panel-dictionary" class="right-panel active">
-        <input type="text" class="dict-search" id="dict-search" placeholder="పదం వెతకండి...">
-        <div id="dict-results"></div>
+        <div class="dict-search-box">
+          <input type="text" class="dict-input" id="dict-search-input" placeholder="పదాన్ని వెతకండి..." onkeypress="if(event.key==='Enter') searchDictionary()">
+          <button class="dict-search-btn" onclick="searchDictionary()">వెతుకు</button>
+        </div>
+        <div class="dict-results" id="dict-results">
+          <div class="dict-empty">
+            <p>తెలుగు పదాల అర్థాలు తెలుసుకోవడానికి పైన వెతకండి.</p>
+            <div class="dict-quick-words">
+              <div class="dict-quick-word" onclick="quickSearch('పుస్తకం')">పుస్తకం</div>
+              <div class="dict-quick-word" onclick="quickSearch('రచన')">రచన</div>
+              <div class="dict-quick-word" onclick="quickSearch('కవిత')">కవిత</div>
+              <div class="dict-quick-word" onclick="quickSearch('కథ')">కథ</div>
+              <div class="dict-quick-word" onclick="quickSearch('భాష')">భాష</div>
+              <div class="dict-quick-word" onclick="quickSearch('విద్య')">విద్య</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Synonyms Panel -->
-      <div id="panel-synonyms" class="right-panel">
-        <input type="text" class="dict-search" id="syn-search" placeholder="పర్యాయపదాలు వెతకండి...">
-        <div id="syn-results"></div>
+      <!-- Reference Panel -->
+      <div id="panel-reference" class="right-panel">
+        <div class="ref-panel-content">
+          <div class="ref-section">
+            <div class="ref-title">తెలుగు వ్యాకరణం</div>
+            <div class="ref-item" onclick="insertText('అ ఆ ఇ ఈ ఉ ఊ ఋ ౠ ఎ ఏ ఐ ఒ ఓ ఔ అం అః')">అచ్చులు (Vowels)</div>
+            <div class="ref-item" onclick="insertText('క ఖ గ ఘ ఙ చ ఛ జ ఝ ఞ ట ఠ డ ఢ ణ త థ ద ధ న ప ఫ బ భ మ య ర ల వ శ ష స హ ళ క్ష')">హల్లులు (Consonants)</div>
+            <div class="ref-item" onclick="insertText('ా ి ీ ు ూ ృ ౄ ె ే ై ొ ో ౌ ం ః')">గుణింతాలు (Diacritics)</div>
+          </div>
+          <div class="ref-section">
+            <div class="ref-title">సాధారణ పదబంధాలు</div>
+            <div class="ref-item" onclick="insertText('శుభోదయం')">శుభోదయం</div>
+            <div class="ref-item" onclick="insertText('నమస్కారం')">నమస్కారం</div>
+            <div class="ref-item" onclick="insertText('ధన్యవాదాలు')">ధన్యవాదాలు</div>
+            <div class="ref-item" onclick="insertText('క్షమించండి')">క్షమించండి</div>
+          </div>
+          <div class="ref-section">
+            <div class="ref-title">సంఖ్యలు</div>
+            <div class="ref-item" onclick="insertText('ఒకటి రెండు మూడు నాలుగు ఐదు ఆరు ఏడు ఎనిమిది తొమ్మిది పది')">1-10 సంఖ్యలు</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Panel -->
+      <div id="panel-settings" class="right-panel">
+        <div class="setting-group">
+          <label class="setting-label">భాష (Language)</label>
+          <div class="lang-opts">
+            <button class="lang-opt active" onclick="setLang('te', this)">తెలుగు</button>
+            <button class="lang-opt" onclick="setLang('en', this)">English</button>
+            <button class="lang-opt" onclick="setLang('mix', this)">Mixed</button>
+          </div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">ఎగుమతి (Export)</label>
+          <button class="setting-btn" onclick="exportAs('txt')">📄 TXT</button>
+          <button class="setting-btn" onclick="exportAs('html')">🌐 HTML</button>
+          <button class="setting-btn" onclick="exportAs('pdf')">📕 PDF/Print</button>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">గణాంకాలు (Statistics)</label>
+          <button class="setting-btn" onclick="showStats()">📊 వివరాలు చూడండి</button>
+        </div>
       </div>
     </div>
 
     <!-- Sidebar Toggles -->
-    <div id="left-toggle" class="sidebar-toggle left" onclick="toggleSidebar('left')">◀</div>
-    <div id="right-toggle" class="sidebar-toggle right" onclick="toggleSidebar('right')">▶</div>
+    <button class="sidebar-toggle" id="left-toggle" onclick="toggleSidebar('left')">◀</button>
+    <button class="sidebar-toggle" id="right-toggle" onclick="toggleSidebar('right')">▶</button>
   </div>
 
   <!-- STATUS BAR -->
@@ -196,17 +252,17 @@
       <button class="modal-close" onclick="closeModal('book-info-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="meta-group">
-        <label class="meta-label">పుస్తక పేరు</label>
-        <input type="text" class="meta-input" id="modal-title">
+      <div class="form-group">
+        <label class="form-label">పుస్తక పేరు</label>
+        <input type="text" class="form-input" id="modal-title">
       </div>
-      <div class="meta-group">
-        <label class="meta-label">రచయిత</label>
-        <input type="text" class="meta-input" id="modal-author">
+      <div class="form-group">
+        <label class="form-label">రచయిత</label>
+        <input type="text" class="form-input" id="modal-author">
       </div>
-      <div class="meta-group">
-        <label class="meta-label">ప్రకారం</label>
-        <select class="meta-input" id="modal-genre">
+      <div class="form-group">
+        <label class="form-label">ప్రకారం</label>
+        <select class="form-input" id="modal-genre">
           <option value="">ఎంచుకోండి...</option>
           <option value="కథ">కథ</option>
           <option value="నవల">నవల</option>
@@ -216,17 +272,17 @@
           <option value="ప్రవచనం">ప్రవచనం</option>
         </select>
       </div>
-      <div class="meta-group">
-        <label class="meta-label">ప్రచురణకర్త</label>
-        <input type="text" class="meta-input" id="modal-publisher">
+      <div class="form-group">
+        <label class="form-label">ప్రచురణకర్త</label>
+        <input type="text" class="form-input" id="modal-publisher">
       </div>
-      <div class="meta-group">
-        <label class="meta-label">ISBN</label>
-        <input type="text" class="meta-input" id="modal-isbn">
+      <div class="form-group">
+        <label class="form-label">ISBN</label>
+        <input type="text" class="form-input" id="modal-isbn">
       </div>
-      <div class="meta-group">
-        <label class="meta-label">సంవత్సరం</label>
-        <input type="text" class="meta-input" id="modal-year">
+      <div class="form-group">
+        <label class="form-label">సంవత్సరం</label>
+        <input type="text" class="form-input" id="modal-year">
       </div>
       <button class="modal-btn" onclick="saveBookInfoFromModal()">సేవ్ చేయి</button>
     </div>
