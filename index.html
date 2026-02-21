@@ -423,26 +423,29 @@
 <!-- Notification -->
 <div id="notification"></div>
 
-<!-- Aksharamukha: exact CDN from official docs -->
+<!-- Aksharamukha CDN — exact URL from official docs, no version pin -->
 <script src="https://cdn.jsdelivr.net/npm/aksharamukha/dist/index.global.js"></script>
 <script src="script.js"></script>
 
-<!-- Module script: top-level await is required for Aksharamukha.new() -->
-<!-- This runs AFTER script.js so window.onAksharamukhaReady is defined  -->
+<!--
+  Aksharamukha.new() MUST be called with top-level await inside a module script.
+  This runs after script.js so window._onAksharamukhaReady is already defined.
+-->
 <script type="module">
   try {
     const instance = await Aksharamukha.new();
     window._aksharamukha = instance;
-    console.log('Aksharamukha ready ✓');
-    // Signal script.js that the engine is available
     if (typeof window._onAksharamukhaReady === 'function') {
       window._onAksharamukhaReady(instance);
     }
   } catch(e) {
-    console.error('Aksharamukha failed to load:', e);
+    console.error('Aksharamukha load error:', e);
     const btn = document.getElementById('translit-toggle-btn');
-    if (btn) btn.title = 'Transliteration unavailable — refresh page';
+    if (btn) {
+      btn.textContent = '🔤 EN→TE: ❌';
+      btn.title = 'Transliteration engine failed to load — try refreshing';
+      btn.style.color = '#e74c3c';
+    }
   }
 </script>
 </body>
-</html>

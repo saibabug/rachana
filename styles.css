@@ -14,7 +14,7 @@
   --border: #2e2318;
   --border-gold: #4a3a1e;
   --accent: #c9933a;
-  --sidebar-w: 240px;
+  --sidebar-w: 280px;
   --toolbar-h: 56px;
   --status-h: 28px;
 }
@@ -127,13 +127,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: 
 }
 
 /* ═══ MAIN LAYOUT ═══ */
-#main { 
-  display: flex; 
-  overflow: hidden; 
-  position: relative;
-  flex: 1;
-  min-height: 0;
-}
+#main { display: flex; overflow: hidden; position: relative; }
 
 /* ═══ LEFT SIDEBAR ═══ */
 #sidebar-left {
@@ -210,13 +204,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: 
 .chapter-delete:hover { background: var(--rust); color: white; }
 
 /* ═══ EDITOR ═══ */
-#editor-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-}
 #editor-container {
   flex: 1;
   display: flex;
@@ -518,21 +505,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: 
 #right-toggle { right: var(--sidebar-w); }
 #right-toggle.collapsed { right: 0; }
 
-/* ═══ STATUS BAR ═══ */
-#statusbar {
-  background: var(--bg-panel);
-  border-top: 1px solid var(--border);
-  height: var(--status-h);
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
-  font-size: 10px;
-  color: var(--text-muted);
-}
-#total-stats {
-  font-size: 11px;
-}
-
 /* ═══ MODALS ═══ */
 .modal-overlay {
   display: none;
@@ -611,20 +583,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: 
 
 /* Wide modal for export preview */
 .modal-wide { max-width: 900px; }
-.modal-large { max-width: 900px; }
-.modal-btn {
-  width: 100%;
-  background: rgba(201,147,58,0.2);
-  border: 1px solid var(--border-gold);
-  color: var(--gold-light);
-  padding: 10px;
-  border-radius: 4px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: 'Noto Sans Telugu', sans-serif;
-}
-.modal-btn:hover { background: rgba(201,147,58,0.35); }
 #preview-content { padding: 20px; background: white; color: #2a1e0f; font-family: 'Noto Serif Telugu', serif; line-height: 1.8; max-height: 60vh; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; }
 #layout-buttons { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .layout-btn { flex: 1; min-width: 100px; padding: 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; text-align: center; font-size: 11px; color: var(--text-light); transition: all 0.2s; }
@@ -637,25 +595,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: 
 /* Cover Modal */
 #cover-modal .modal { max-width: 850px; }
 .cover-designer { display: grid; grid-template-columns: 420px 1fr; gap: 20px; }
-.cover-group { margin-bottom: 14px; }
-.cover-label { 
-  display: block;
-  font-size: 11px; 
-  color: var(--text-muted); 
-  margin-bottom: 6px;
-}
-.cover-input {
-  width: 100%;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: var(--text-light);
-  padding: 6px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  outline: none;
-  font-family: 'Noto Sans Telugu', sans-serif;
-}
-.cover-input:focus { border-color: var(--gold); }
 #cover-preview { 
   width: 400px; 
   height: 600px; 
@@ -750,75 +689,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-deep); color: 
 ::-webkit-scrollbar-track { background: var(--bg-card); }
 ::-webkit-scrollbar-thumb { background: var(--border-gold); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
-
-/* ═══ RESPONSIVE LAYOUT ═══ */
-@media (max-width: 1400px) {
-  :root {
-    --sidebar-w: 220px;
-  }
-}
-
-@media (max-width: 1200px) {
-  :root {
-    --sidebar-w: 200px;
-  }
-  #text-editor {
-    padding: 24px 32px;
-  }
-}
-
-@media (max-width: 900px) {
-  #sidebar-left,
-  #sidebar-right {
-    position: absolute;
-    height: 100%;
-    z-index: 100;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-  }
-  #sidebar-left {
-    left: 0;
-  }
-  #sidebar-right {
-    right: 0;
-  }
-  #sidebar-left.collapsed {
-    left: calc(-1 * var(--sidebar-w));
-  }
-  #sidebar-right.collapsed {
-    right: calc(-1 * var(--sidebar-w));
-  }
-  #left-toggle,
-  #right-toggle {
-    z-index: 101;
-  }
-}
-
-/* ═══ TRANSLITERATION SECTION ═══ */
-#translitInput {
-  font-family: 'Courier New', monospace;
-  background: var(--bg-editor);
-  color: #333;
-  border: 1px solid var(--border-gold);
-}
-
-#translitInput:focus {
-  outline: 2px solid var(--gold);
-  outline-offset: -1px;
-}
-
-#translitOutput {
-  font-family: 'Nirmala UI', 'Gautami', 'Noto Serif Telugu', serif !important;
-  line-height: 1.6;
-  word-wrap: break-word;
-}
-
-#translitOutput:empty::before {
-  content: 'తెలుగు అక్షరాలు ఇక్కడ కనిపిస్తాయి...';
-  color: #999;
-  font-size: 14px;
-  font-style: italic;
-}
-
 </style>
     let content = `<!DOCTYPE html><html lang="te"><head><meta charset="UTF-8"><title>${title}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@400;700&display=swap" rel="stylesheet"><style>${css}</style></head><body>`;
     content += `<h1>${title}</h1><p style="text-align:center;">${author} రచించిన</p><hr>`;
