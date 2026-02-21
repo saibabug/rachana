@@ -884,7 +884,7 @@ function _translitKeydown(e) {
   // ── Navigation / Function keys — flush buffer silently ──
   if (key.length > 1 && key !== 'Backspace' && key !== 'Enter') {
     // Arrow keys, Home, End, etc. — discard buffer (cursor moved away)
-    _wordBuffer = '';
+    _wordBuffer = ' ';
     return; // don't preventDefault — let browser move cursor
   }
 
