@@ -793,7 +793,7 @@ window.addEventListener('load', () => {
 //
 //  This keeps the browser's own cursor management intact at all times.
 
-let editorTranslitEnabled = true;
+let editorTranslitEnabled = false;
 let _wordBuffer = '';      // raw English letters of the current word
 let _isCommitting = false; // guard against re-entrant keydown during async commit
 
